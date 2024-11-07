@@ -16,7 +16,7 @@ intents.voice_states = True
 
 client = commands.Bot(command_prefix= "-", intents=intents)
 
-def write_log(message, sender, server, channel):
+def write_log(message, sender, server, channel, userID):
     now = datetime.now()
     date = now.strftime("%Y-%m-%d")  # Format the date as YYYY-MM-DD
     time = now.strftime("%H:%M:%S")  # Format the time as HH:MM:SS
@@ -26,7 +26,7 @@ def write_log(message, sender, server, channel):
         writer = csv.writer(file)
 
         # Write a row with date, time, server ,sender, and message
-        writer.writerow([date, time, server, channel, sender, message])
+        writer.writerow([date, time, server, channel, userID, sender, message])
 
 sheet_id = "1kMtrvjDKAevBPcBitv2b8u7m0yxANfuC19XNSp-01Xc"
 sheet_name = "Log_Example"
@@ -65,13 +65,24 @@ async def on_ready():
 @client.event
 async def on_message(message):
     # Write Log.csv
-    write_log(str(message.content), str(message.author), str(message.guild.name), str(message.channel.name))
+    message_ = str(message.content)
+    author_ = str(message.author)
+    userID_ = str(message.author.id)
+    if message.guild is None:
+        server_ = 'DM'
+        channel_ = 'DM'
+    else:
+        server_ = str(message.guild.name)
+        channel_ = str(message.channel.name)
+    write_log(message=message_, sender=author_, server=server_, channel=channel_, userID=userID_)
 
     # Ignore messages from the bot itself
     if message.author == client.user:
         return
 
     await client.process_commands(message)
+
+# Command ---------------------------------------------------------------------------------------------------------
 
 @client.tree.command(name="qr", description="Generate QR-Code from URL")
 async def qr(interaction: discord.Interaction, url: str):
@@ -81,6 +92,13 @@ async def qr(interaction: discord.Interaction, url: str):
         await interaction.response.send_message(file=discord.File('qrcode.png'))
     except:
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
+
+# import change_language, find_recent_message
+# @client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษา")
+# async def แปล(interaction: discord.Interaction):
+#         guild_name = interaction.guild.name if interaction.guild else "DM"
+#         channel_name = interaction.channel.name if interaction.channel else "DM"
+#         await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
 
 
 client.run(Token)
