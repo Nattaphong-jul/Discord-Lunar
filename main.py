@@ -146,4 +146,14 @@ async def file(interaction: discord.Interaction):
         output_list.append(encryption.decrypt(i, UserID))
     await interaction.response.send_message(f"__{interaction.user.name}__\n- {'\n- '.join(output_list)}")
 
+@client.tree.command(name="command", description="Command List")
+async def command(interaction: discord.Interaction):
+    text = f"""
+__Command__
+- /qr   | สร้าง QR Code จากลิงค์
+- /แปล  | เปลี่ยนภาษาจากการพิมแล้วลืมเปลี่ยนภาษา
+- /file | แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+"""
+    await interaction.response.send_message(text)
+
 client.run(Token)
