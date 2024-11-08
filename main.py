@@ -142,9 +142,19 @@ async def file(interaction: discord.Interaction):
     UserID = str(interaction.user.id)
     file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
     output_list = []
-    for i in file_list:
-        output_list.append(encryption.decrypt(i, UserID))
-    await interaction.response.send_message(f"__{interaction.user.name}__\n- {'\n- '.join(output_list)}")
+    for i in range(len(file_list)):
+        output_list.append(f"[{i+1}] {encryption.decrypt(file_list[i], UserID)}")
+    await interaction.response.send_message(f"__พี่{interaction.user.name}__\n- " + '\n- '.join(output_list))
+
+@client.tree.command(name="ลบไฟล", description="ลบไฟลที่ฝากใว้")
+async def ลบไฟล(interaction: discord.Interaction, file_num: int):
+    UserID = str(interaction.user.id)
+    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    try:
+        os.remove(fr"{script_dir}/Data/{UserID}/{file_list[file_num-1]}")
+        await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[file_num-1], UserID)} แล้วนะคะ:thumbsup:")
+    except:
+        await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
