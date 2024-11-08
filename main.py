@@ -8,6 +8,7 @@ from datetime import datetime
 import pandas as pd
 import csv
 import qrcode
+import change_language, find_recent_message
 
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
@@ -27,6 +28,7 @@ def write_log(message, sender, server, channel, userID):
 
         # Write a row with date, time, server ,sender, and message
         writer.writerow([date, time, server, channel, userID, sender, message])
+        file.close()
 
 sheet_id = "1kMtrvjDKAevBPcBitv2b8u7m0yxANfuC19XNSp-01Xc"
 sheet_name = "Log_Example"
@@ -80,6 +82,23 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if 'แปล' in message.content and message.reference:
+        replied_message = await message.channel.fetch_message(message.reference.message_id)
+
+        if any(eng in message.content for eng in ['Eng', 'eng', 'english', 'อังกิด', 'อังกฤษ', 'อะงกิด']):
+            try:
+                await message.channel.send(change_language.language_change_th(replied_message.content))
+            except:
+                await message.author.send(change_language.language_change_th(replied_message.contents))
+            return
+
+        try:
+            await message.channel.send(change_language.language_change(replied_message.content))
+
+        except:
+            await message.author.send(change_language.language_change(replied_message.contents))
+            
+
     await client.process_commands(message)
 
 # Command ---------------------------------------------------------------------------------------------------------
@@ -93,12 +112,16 @@ async def qr(interaction: discord.Interaction, url: str):
     except:
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
 
-# import change_language, find_recent_message
-# @client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษา")
-# async def แปล(interaction: discord.Interaction):
-#         guild_name = interaction.guild.name if interaction.guild else "DM"
-#         channel_name = interaction.channel.name if interaction.channel else "DM"
-#         await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
+
+@client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษา")
+async def แปล(interaction: discord.Interaction):
+        if interaction.guild and interaction.channel:
+            guild_name = interaction.guild.name
+            channel_name = interaction.channel.name
+        else:
+            guild_name = 'DM'
+            channel_name = 'DM'
+        await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
 
 
 client.run(Token)

@@ -1,9 +1,13 @@
 import pandas as pd
-def find_recent(server, channel):
-    log = pd.read_csv('log.csv')
-    last_index = len(log['Server']) - 2
-    while last_index >= 0:
-        if log['Server'][last_index] == server and log['Channel'][last_index] == channel:
-            return log['Message'][last_index]
-        last_index -= 1
+def find_recent(server: str, channel: str):
+    log = pd.read_csv('log.csv').astype(str)
+    find = 1
+    while find < log.shape[0]:
+        print(-find)
+        if log.iloc[-find]['Server'] == server and log.iloc[-find]['Channel'] == channel:
+            return log.iloc[-find]['Message']
+        find += 1
+
     return 'หนูหาข้อความไม่เจออ่ะคะ'
+
+# print(find_recent('Lunaar', 'bot-test'))
