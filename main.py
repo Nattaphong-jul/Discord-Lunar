@@ -82,9 +82,11 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    # Language Change function
     if 'แปล' in message.content and message.reference:
         replied_message = await message.channel.fetch_message(message.reference.message_id)
 
+        # Check if English is in the message
         if any(eng in message.content for eng in ['Eng', 'eng', 'english', 'อังกิด', 'อังกฤษ', 'อะงกิด']):
             try:
                 await message.channel.send(change_language.language_change_th(replied_message.content))
@@ -92,13 +94,13 @@ async def on_message(message):
                 await message.author.send(change_language.language_change_th(replied_message.contents))
             return
 
+        # Translage to Thai key
         try:
             await message.channel.send(change_language.language_change(replied_message.content))
-
         except:
             await message.author.send(change_language.language_change(replied_message.contents))
             
-
+    # Process the command
     await client.process_commands(message)
 
 # Command ---------------------------------------------------------------------------------------------------------
@@ -113,15 +115,16 @@ async def qr(interaction: discord.Interaction, url: str):
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
 
 
-@client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษา")
+@client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษาจากข้อความล่าสุด")
 async def แปล(interaction: discord.Interaction):
         if interaction.guild and interaction.channel:
             guild_name = interaction.guild.name
             channel_name = interaction.channel.name
+            await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
         else:
             guild_name = 'DM'
             channel_name = 'DM'
-        await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
-
+            userID = interaction.user.id
+            await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name, userID=userID)), ephemeral=False)
 
 client.run(Token)
