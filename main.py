@@ -20,7 +20,8 @@ intents.voice_states = True
 script_dir = os.path.dirname(os.path.abspath(__file__))
 client = commands.Bot(command_prefix= "-", intents=intents)
 
-default_emoji = [":grin:", ":kissing_smiling_eyes:", ":heart:", ":white_heart:", ":smiling_face_with_3_hearts:", ":point_right:"]
+happy_emoji = [":grin:", ":kissing_smiling_eyes:", ":heart:", ":white_heart:", ":smiling_face_with_3_hearts:", ":point_right:"]
+sad_emoji = [":cry:", ":disappointed_relieved:", ":pleading_face:", ":pensive:", ":persevere:"]
 def write_log(message, sender, server, channel, userID):
     now = datetime.now()
     date = now.strftime("%Y-%m-%d")  # Format the date as YYYY-MM-DD
@@ -89,10 +90,18 @@ async def on_message(message):
         download_dir = fr'{script_dir}\Data\{message.author.id}'
         os.makedirs(download_dir, exist_ok=True)
         for attachment in message.attachments:
-            # Download each attachment
-            file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
-            print(f"Saved at {file_path}")
-            await attachment.save(file_path)
+            file_size = attachment.size / 1024**2
+            if file_size < 8:
+                # Download each attachment
+                file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
+                print(f"Saved at {file_path}")
+                await attachment.save(file_path)
+            else:
+                try:
+                    await message.channel.send(f"หนูเก็บไฟล์ได้ไม่เกิน 8 MB นะคะ{random.choice(sad_emoji)}")
+                except:
+                    await message.author.send(f"หนูเก็บไฟล์ได้ไม่เกิน 8 MB นะคะ{random.choice(sad_emoji)}")
+                return
 
     # Language Change function
     if 'แปล' in message.content and message.reference:
@@ -145,8 +154,14 @@ async def file(interaction: discord.Interaction):
     file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
     output_list = []
     for i in range(len(file_list)):
-        output_list.append(f"[{i+1}] {encryption.decrypt(file_list[i], UserID)}")
-    await interaction.response.send_message(f"__พี่{interaction.user.name}__\n- " + '\n- '.join(output_list))
+        output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
+
+    embed = discord.Embed(
+    title=f"__{interaction.user.name}{random.choice(happy_emoji)}__",
+    description='\n'.join(output_list),
+    color=discord.Color.orange()
+    )
+    await interaction.response.send_message(embed=embed)
 
 @client.tree.command(name="ลบไฟล", description="ลบไฟลที่ฝากใว้")
 async def ลบไฟล(interaction: discord.Interaction, file_num: int):
@@ -170,7 +185,7 @@ async def ขอไฟล(interaction: discord.Interaction, file_num: int):
 
         # Copy the file to the temp directory with the decrypted name
         shutil.copy(source_file, destination_file)
-        await interaction.response.send_message(f"นี่ค่ะ{random.choice(default_emoji)}", file=discord.File(fr"{script_dir}/temp/{encryption.decrypt(file_list[file_num-1], UserID)}"))
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(fr"{script_dir}/temp/{encryption.decrypt(file_list[file_num-1], UserID)}"))
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
     finally:
@@ -182,11 +197,17 @@ async def ขอไฟล(interaction: discord.Interaction, file_num: int):
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
     text = f"""
-__Command__
-- /qr   | สร้าง QR Code จากลิงค์
-- /แปล  | เปลี่ยนภาษาจากการพิมแล้วลืมเปลี่ยนภาษา
-- /file | แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+- /qr       | สร้าง QR Code จากลิงค์
+- /แปล      | เปลี่ยนภาษาจากการพิมแล้วลืมเปลี่ยนภาษา
+- /file     | แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+- /ลบไฟล    | ลบไฟล์ที่ฝากใว้
+- /ขอไฟล    | ขอไฟล์ที่ฝากใว้
 """
-    await interaction.response.send_message(text)
+    embed = discord.Embed(
+    title="__Command__",
+    description=text,
+    color=discord.Color.orange()
+    )
+    await interaction.response.send_message(embed=embed)
 
 client.run(Token)

@@ -50,11 +50,11 @@ def decrypt(encrypted_text, key):
 
     return ''.join(decrypted_text)
 
-# Example usage
-text = "FileName123"
-key = "123456781234567890"
-encrypted_text = encrypt(text, key)
-print("Encrypted text:", encrypted_text)
+# # Example usage
+# text = "FileName123"
+# key = "123456781234567890"
+# encrypted_text = encrypt(text, key)
+# print("Encrypted text:", encrypted_text)
 
-decrypted_text = decrypt(encrypted_text, key)
-print("Decrypted text:", decrypted_text)
+# decrypted_text = decrypt(encrypted_text, key)
+# print("Decrypted text:", decrypted_text)
