@@ -11,7 +11,8 @@ import qrcode
 import change_language, find_recent_message
 import os
 import encryption
-
+import shutil
+import random
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -19,6 +20,7 @@ intents.voice_states = True
 script_dir = os.path.dirname(os.path.abspath(__file__))
 client = commands.Bot(command_prefix= "-", intents=intents)
 
+default_emoji = [":grin:", ":kissing_smiling_eyes:", ":heart:", ":white_heart:", ":smiling_face_with_3_hearts:", ":point_right:"]
 def write_log(message, sender, server, channel, userID):
     now = datetime.now()
     date = now.strftime("%Y-%m-%d")  # Format the date as YYYY-MM-DD
@@ -155,6 +157,27 @@ async def ลบไฟล(interaction: discord.Interaction, file_num: int):
         await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[file_num-1], UserID)} แล้วนะคะ:thumbsup:")
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
+
+@client.tree.command(name="ขอไฟล", description="ขอไฟลที่ฝากใว้")
+async def ขอไฟล(interaction: discord.Interaction, file_num: int):
+    UserID = str(interaction.user.id)
+    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    try:
+        # Define the source file and the decrypted destination file path
+        source_file = fr"{script_dir}/Data/{UserID}/{file_list[file_num - 1]}"
+        decrypted_filename = encryption.decrypt(file_list[file_num - 1], UserID)
+        destination_file = fr"{script_dir}/temp/{decrypted_filename}"
+
+        # Copy the file to the temp directory with the decrypted name
+        shutil.copy(source_file, destination_file)
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(default_emoji)}", file=discord.File(fr"{script_dir}/temp/{encryption.decrypt(file_list[file_num-1], UserID)}"))
+    except:
+        await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
+    finally:
+        # Remove the temporary file after sending
+        if os.path.exists(destination_file):
+            os.remove(destination_file)
+    
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
