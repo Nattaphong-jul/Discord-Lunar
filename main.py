@@ -9,12 +9,14 @@ import pandas as pd
 import csv
 import qrcode
 import change_language, find_recent_message
+import os
+import encryption
 
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
 client = commands.Bot(command_prefix= "-", intents=intents)
 
 def write_log(message, sender, server, channel, userID):
@@ -58,7 +60,6 @@ async def on_ready():
     print("Proxima is ready")
     try:
         # Sync the commands with Discord (in case you add new commands)
-        
         synced = await client.tree.sync()
         print(f"Synced {len(synced)} command(s).")
     except Exception as e:
@@ -82,12 +83,21 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    if message.attachments:
+        download_dir = fr'{script_dir}\Data\{message.author.id}'
+        os.makedirs(download_dir, exist_ok=True)
+        for attachment in message.attachments:
+            # Download each attachment
+            file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
+            print(f"Saved at {file_path}")
+            await attachment.save(file_path)
+
     # Language Change function
     if 'แปล' in message.content and message.reference:
         replied_message = await message.channel.fetch_message(message.reference.message_id)
 
         # Check if English is in the message
-        if any(eng in message.content for eng in ['Eng', 'eng', 'english', 'อังกิด', 'อังกฤษ', 'อะงกิด']):
+        if any(eng in message.content for eng in ['Eng', 'eng', 'english', 'อังกิด', 'อังกฤษ', 'อะงกิด', 'อิ้ง']):
             try:
                 await message.channel.send(change_language.language_change_th(replied_message.content))
             except:
@@ -126,5 +136,14 @@ async def แปล(interaction: discord.Interaction):
             channel_name = 'DM'
             userID = interaction.user.id
             await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name, userID=userID)), ephemeral=False)
+
+@client.tree.command(name="file", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
+async def file(interaction: discord.Interaction):
+    UserID = str(interaction.user.id)
+    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    output_list = []
+    for i in file_list:
+        output_list.append(encryption.decrypt(i, UserID))
+    await interaction.response.send_message(f"__{interaction.user.name}__\n- {'\n- '.join(output_list)}")
 
 client.run(Token)
