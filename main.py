@@ -13,7 +13,7 @@ import os
 import encryption
 import shutil
 import random
-
+import environment_folder
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -127,8 +127,8 @@ async def แปล(interaction: discord.Interaction):
             userID = interaction.user.id
             await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name, userID=userID)), ephemeral=False)
 
-@client.tree.command(name="file", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
-async def file(interaction: discord.Interaction):
+@client.tree.command(name="list", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
+async def list(interaction: discord.Interaction):
     UserID = str(interaction.user.id)
     file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
     output_list = []
@@ -172,33 +172,75 @@ async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
         if os.path.exists(destination_file):
             os.remove(destination_file)
 
-import move_all_file
 @client.tree.command(name="ฝาก", description="ฝากไฟล์ใว้ที่ Proxima")
 async def ฝาก(interaction: discord.Interaction):
-    path = fr'{script_dir}\temp\Data\{interaction.user.id}'
-    havefile = os.listdir(path)
-    if len(havefile) >= 1:
-        move_all_file.move_all_files(path, f"{script_dir}\Data\{interaction.user.id}")
+    try:
+        path = fr'{script_dir}\temp\Data\{interaction.user.id}'
+        havefile = os.listdir(path)
+        moved_file = []
+        remaining = []
+        if len(havefile) >= 1:
+            dest_dir = f"{script_dir}\Data\{interaction.user.id}"
+            if not os.path.exists(dest_dir):
+                os.makedirs(dest_dir)
 
-    decrypt_list = []
-    for i in havefile:
-        decrypt_list.append("+ " + encryption.decrypt(i, str(interaction.user.id)))
+            # Iterate over all files in the source directory
+            for filename in os.listdir(path):
+                src_path = os.path.join(path, filename)
+                dest_path = os.path.join(dest_dir, filename)
+
+                # Check if it's a file before moving (ignoring subdirectories)
+                if os.path.isfile(src_path):
+                    file_size = os.path.getsize(src_path)  / (1024 * 1024)
+                    if file_size < 8:
+                        shutil.move(src_path, dest_path)
+                        print(f"Moved {filename} to {dest_dir}")
+                        moved_file.append(":ballot_box_with_check:  " + encryption.decrypt(filename, str(interaction.user.id)))
+                    else:
+                        os.remove(src_path)
+                        remaining.append(":exclamation:  ~~" + encryption.decrypt(filename, str(interaction.user.id)) + "~~")     
+
+        else:
+            await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์มาให้หนูนะคะ{random.choice(sad_emoji)}")
+            return
+
+        if len(remaining) < 1:
+            embed = discord.Embed(
+            title=f"__{interaction.user.name}__",
+            description='\n'.join(moved_file),
+            color=discord.Color.orange()
+            )
+            await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
+        else:
+            embed = discord.Embed(
+            title=f"__{interaction.user.name}__",
+            description='\n'.join(moved_file) ,
+            color=discord.Color.orange()
+            )
+            embed.add_field(name=f"**ไฟล์นี้เกิน 8MB นะคะ{random.choice(sad_emoji)}**", value='\n'.join(remaining), inline=False)
+            await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
+    except:
+        await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์มาให้หนูนะคะ{random.choice(sad_emoji)}")
+
+
+@client.tree.command(name="id", description="ดู User ID ของตัวเอง")
+async def id(interaction: discord.Interaction):
     embed = discord.Embed(
-    title=f"__{interaction.user.name}__",
-    description='\n'.join(decrypt_list),
+    title=f"__{interaction.user.name} ID__: {interaction.user.id}",
     color=discord.Color.orange()
     )
-    await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
-
+    await interaction.response.send_message(embed=embed, ephemeral=True)
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
     text = f"""
-- /qr       | สร้าง QR Code จากลิงค์
-- /แปล      | เปลี่ยนภาษาจากการพิมแล้วลืมเปลี่ยนภาษา
-- /file     | แสดงรายการไฟลที่ฝากใว้ทั้งหมด
-- /ลบไฟล์    | ลบไฟล์ที่ฝากใว้
-- /ขอไฟล์    | ขอไฟล์ที่ฝากใว้
+- /qr       :white_square_button: สร้าง QR Code จากลิงค์
+- /แปล      :keyboard: แกคำจากการพิมแล้วลืมเปลี่ยนภาษา
+- /list     :dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+- /ลบไฟล์    :wastebasket: ลบไฟล์ที่ฝากใว้
+- /ขอไฟล์    :page_facing_up: ขอไฟล์ที่ฝากใว้
+- /ฝาก      :open_file_folder: ฝากไฟล์ใว้ที่ Proxima
+- /id       :identification_card: ดู User ID ของตัวเอง 
 """
     embed = discord.Embed(
     title="__Command__",
