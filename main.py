@@ -130,7 +130,7 @@ async def แปล(interaction: discord.Interaction):
 @client.tree.command(name="list", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
 async def list(interaction: discord.Interaction):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
     output_list = []
     for i in range(len(file_list)):
         output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
@@ -145,9 +145,9 @@ async def list(interaction: discord.Interaction):
 @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
 async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
     try:
-        os.remove(fr"{script_dir}/Data/{UserID}/{file_list[file_num-1]}")
+        os.remove(fr"{script_dir}\Data\{UserID}\{file_list[file_num-1]}")
         await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[file_num-1], UserID)} แล้วนะคะ:thumbsup:")
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
@@ -155,16 +155,16 @@ async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
 @client.tree.command(name="ขอไฟล์", description="ขอไฟล์ที่ฝากใว้")
 async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
+    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
     try:
         # Define the source file and the decrypted destination file path
-        source_file = fr"{script_dir}/Data/{UserID}/{file_list[file_num - 1]}"
+        source_file = fr"{script_dir}\Data\{UserID}\{file_list[file_num - 1]}"
         decrypted_filename = encryption.decrypt(file_list[file_num - 1], UserID)
-        destination_file = fr"{script_dir}/temp/{decrypted_filename}"
+        destination_file = fr"{script_dir}\temp\{decrypted_filename}"
 
         # Copy the file to the temp directory with the decrypted name
         shutil.copy(source_file, destination_file)
-        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(fr"{script_dir}/temp/{encryption.decrypt(file_list[file_num-1], UserID)}"))
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(fr"{script_dir}\temp\{encryption.decrypt(file_list[file_num-1], UserID)}"))
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
     finally:
