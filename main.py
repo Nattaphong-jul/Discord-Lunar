@@ -20,7 +20,7 @@ intents.message_content = True
 intents.voice_states = True
 script_dir = os.path.dirname(os.path.abspath(__file__))
 client = commands.Bot(command_prefix= "-", intents=intents)
-
+print(f"running on:{script_dir}")
 happy_emoji = [":grin:", ":kissing_smiling_eyes:", ":heart:", ":white_heart:", ":smiling_face_with_3_hearts:", ":point_right:"]
 sad_emoji = [":cry:", ":disappointed_relieved:", ":pleading_face:", ":pensive:", ":persevere:"]
 def write_log(message, sender, server, channel, userID):
@@ -180,7 +180,7 @@ async def ฝาก(interaction: discord.Interaction):
         moved_file = []
         remaining = []
         if len(havefile) >= 1:
-            dest_dir = fr"{script_dir}\Data\{interaction.user.id}"
+            dest_dir = f"{script_dir}\Data\{interaction.user.id}"
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
 
