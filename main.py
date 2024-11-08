@@ -13,6 +13,7 @@ import os
 import encryption
 import shutil
 import random
+
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -34,29 +35,6 @@ def write_log(message, sender, server, channel, userID):
         # Write a row with date, time, server ,sender, and message
         writer.writerow([date, time, server, channel, userID, sender, message])
         file.close()
-
-sheet_id = "1kMtrvjDKAevBPcBitv2b8u7m0yxANfuC19XNSp-01Xc"
-sheet_name = "Log_Example"
-url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
-def language_change(text):
-  df = pd.read_csv(url)
-  converted = ""
-  for i in text:
-    try:
-        if i in df['Eng'].tolist():
-            converted = converted + str(df['Thai'][df['Eng'].tolist().index(i)])
-        elif i in df['Shift_Eng'].tolist():
-            converted = converted + str(df['Shift_Thai'][df['Shift_Eng'].tolist().index(i)])
-        elif i == " ":
-            converted = converted + " "
-        else:
-            converted = converted + i
-            
-    except:
-      continue
-  return converted
-
-
 
 @client.event
 async def on_ready():
@@ -80,6 +58,8 @@ async def on_message(message):
     else:
         server_ = str(message.guild.name)
         channel_ = str(message.channel.name)
+    if message.attachments:
+        message_ = 'Attachment'
     write_log(message=message_, sender=author_, server=server_, channel=channel_, userID=userID_)
 
     # Ignore messages from the bot itself
@@ -87,21 +67,20 @@ async def on_message(message):
         return
 
     if message.attachments:
-        download_dir = fr'{script_dir}\Data\{message.author.id}'
+        download_dir = fr'{script_dir}\temp\Data\{message.author.id}'
         os.makedirs(download_dir, exist_ok=True)
         for attachment in message.attachments:
-            file_size = attachment.size / 1024**2
-            if file_size < 8:
+            # file_size = attachment.size / 1024**2
                 # Download each attachment
-                file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
-                print(f"Saved at {file_path}")
-                await attachment.save(file_path)
-            else:
-                try:
-                    await message.channel.send(f"หนูเก็บไฟล์ได้ไม่เกิน 8 MB นะคะ{random.choice(sad_emoji)}")
-                except:
-                    await message.author.send(f"หนูเก็บไฟล์ได้ไม่เกิน 8 MB นะคะ{random.choice(sad_emoji)}")
-                return
+            file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
+            print(f"Saved at {file_path}")
+            await attachment.save(file_path)
+    elif str(message.author.id) in os.listdir(fr'{script_dir}\temp\Data'):
+        print("deleting")
+        try:
+            shutil.rmtree(fr'{script_dir}\temp\Data\{message.author.id}')
+        except:
+            print(f"Empty Folder: " + fr'{script_dir}\temp\Data\{message.author.id}')
 
     # Language Change function
     if 'แปล' in message.content and message.reference:
@@ -163,8 +142,8 @@ async def file(interaction: discord.Interaction):
     )
     await interaction.response.send_message(embed=embed)
 
-@client.tree.command(name="ลบไฟล", description="ลบไฟลที่ฝากใว้")
-async def ลบไฟล(interaction: discord.Interaction, file_num: int):
+@client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
+async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
     file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
     try:
@@ -173,8 +152,8 @@ async def ลบไฟล(interaction: discord.Interaction, file_num: int):
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
 
-@client.tree.command(name="ขอไฟล", description="ขอไฟลที่ฝากใว้")
-async def ขอไฟล(interaction: discord.Interaction, file_num: int):
+@client.tree.command(name="ขอไฟล์", description="ขอไฟล์ที่ฝากใว้")
+async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
     file_list = os.listdir(fr"{script_dir}/Data/{UserID}")
     try:
@@ -192,7 +171,25 @@ async def ขอไฟล(interaction: discord.Interaction, file_num: int):
         # Remove the temporary file after sending
         if os.path.exists(destination_file):
             os.remove(destination_file)
-    
+
+import move_all_file
+@client.tree.command(name="ฝาก", description="ฝากไฟล์ใว้ที่ Proxima")
+async def ฝาก(interaction: discord.Interaction):
+    path = fr'{script_dir}\temp\Data\{interaction.user.id}'
+    havefile = os.listdir(path)
+    if len(havefile) >= 1:
+        move_all_file.move_all_files(path, f"{script_dir}\Data\{interaction.user.id}")
+
+    decrypt_list = []
+    for i in havefile:
+        decrypt_list.append("+ " + encryption.decrypt(i, str(interaction.user.id)))
+    embed = discord.Embed(
+    title=f"__{interaction.user.name}__",
+    description='\n'.join(decrypt_list),
+    color=discord.Color.orange()
+    )
+    await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
+
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
@@ -200,8 +197,8 @@ async def command(interaction: discord.Interaction):
 - /qr       | สร้าง QR Code จากลิงค์
 - /แปล      | เปลี่ยนภาษาจากการพิมแล้วลืมเปลี่ยนภาษา
 - /file     | แสดงรายการไฟลที่ฝากใว้ทั้งหมด
-- /ลบไฟล    | ลบไฟล์ที่ฝากใว้
-- /ขอไฟล    | ขอไฟล์ที่ฝากใว้
+- /ลบไฟล์    | ลบไฟล์ที่ฝากใว้
+- /ขอไฟล์    | ขอไฟล์ที่ฝากใว้
 """
     embed = discord.Embed(
     title="__Command__",
