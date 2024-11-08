@@ -180,7 +180,7 @@ async def ฝาก(interaction: discord.Interaction):
         moved_file = []
         remaining = []
         if len(havefile) >= 1:
-            dest_dir = f"{script_dir}\Data\{interaction.user.id}"
+            dest_dir = fr"{script_dir}\Data\{interaction.user.id}"
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
 
