@@ -14,6 +14,9 @@ import encryption
 import shutil
 import random
 import environment_folder
+
+environment_folder.ensure_data_directories()
+environment_folder.check_or_create_log()
 Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
 intents = discord.Intents.default()
 intents.message_content = True
@@ -67,7 +70,8 @@ async def on_message(message):
         return
 
     if message.attachments:
-        download_dir = fr'{script_dir}\temp\Data\{message.author.id}'
+        # download_dir = fr'{script_dir}/temp/Data/{message.author.id}'
+        download_dir = os.path.join(script_dir, 'temp', 'Data', str(message.author.id))
         os.makedirs(download_dir, exist_ok=True)
         for attachment in message.attachments:
             # file_size = attachment.size / 1024**2
@@ -75,12 +79,12 @@ async def on_message(message):
             file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
             print(f"Saved at {file_path}")
             await attachment.save(file_path)
-    elif str(message.author.id) in os.listdir(fr'{script_dir}\temp\Data'):
+    elif str(message.author.id) in os.listdir(os.path.join(script_dir, 'temp', 'Data')):
         print("deleting")
         try:
-            shutil.rmtree(fr'{script_dir}\temp\Data\{message.author.id}')
+            shutil.rmtree(os.path.join(script_dir, 'temp', 'Data', str(message.author.id)))
         except:
-            print(f"Empty Folder: " + fr'{script_dir}\temp\Data\{message.author.id}')
+            print(f"Empty Folder: " + os.path.join(script_dir, 'temp', 'Data', str(message.author.id)))
 
     # Language Change function
     if 'แปล' in message.content and message.reference:
@@ -108,9 +112,10 @@ async def on_message(message):
 @client.tree.command(name="qr", description="Generate QR-Code from URL")
 async def qr(interaction: discord.Interaction, url: str):
     try:
+        qr_path = script_dir + 'qrcode.png'
         img = qrcode.make(url)
-        img.save('qrcode.png')
-        await interaction.response.send_message(file=discord.File('qrcode.png'))
+        img.save(qr_path)
+        await interaction.response.send_message(file=discord.File(qr_path))
     except:
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
 
@@ -130,7 +135,7 @@ async def แปล(interaction: discord.Interaction):
 @client.tree.command(name="list", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
 async def list(interaction: discord.Interaction):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
+    file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     output_list = []
     for i in range(len(file_list)):
         output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
@@ -145,9 +150,9 @@ async def list(interaction: discord.Interaction):
 @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
 async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
+    file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     try:
-        os.remove(fr"{script_dir}\Data\{UserID}\{file_list[file_num-1]}")
+        os.remove(os.path.join(script_dir, 'Data', UserID, file_list[file_num-1]))
         await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[file_num-1], UserID)} แล้วนะคะ:thumbsup:")
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
@@ -155,16 +160,16 @@ async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
 @client.tree.command(name="ขอไฟล์", description="ขอไฟล์ที่ฝากใว้")
 async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
     UserID = str(interaction.user.id)
-    file_list = os.listdir(fr"{script_dir}\Data\{UserID}")
+    file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     try:
         # Define the source file and the decrypted destination file path
-        source_file = fr"{script_dir}\Data\{UserID}\{file_list[file_num - 1]}"
+        source_file = os.path(script_dir, 'Data', UserID, file_list[file_num - 1])
         decrypted_filename = encryption.decrypt(file_list[file_num - 1], UserID)
-        destination_file = fr"{script_dir}\temp\{decrypted_filename}"
+        destination_file = os.path.join(script_dir, 'temp', decrypted_filename)
 
         # Copy the file to the temp directory with the decrypted name
         shutil.copy(source_file, destination_file)
-        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(fr"{script_dir}\temp\{encryption.decrypt(file_list[file_num-1], UserID)}"))
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(os.path.join(script_dir, 'temp', encryption.decrypt(file_list[file_num-1], UserID))))
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
     finally:
@@ -175,12 +180,12 @@ async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
 @client.tree.command(name="ฝาก", description="ฝากไฟล์ใว้ที่ Proxima")
 async def ฝาก(interaction: discord.Interaction):
     try:
-        path = fr'{script_dir}\temp\Data\{interaction.user.id}'
+        path = os.path.join(script_dir, 'temp', 'Data', str(interaction.user.id))
         havefile = os.listdir(path)
         moved_file = []
         remaining = []
         if len(havefile) >= 1:
-            dest_dir = f"{script_dir}\Data\{interaction.user.id}"
+            dest_dir = os.path.join(script_dir, 'Data', str(interaction.user.id))
             if not os.path.exists(dest_dir):
                 os.makedirs(dest_dir)
 

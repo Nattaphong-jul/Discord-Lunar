@@ -1,9 +1,12 @@
 import os
+import csv
 
 def ensure_data_directories():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    print(f"Stored in: {script_dir}")
     # Define the paths
-    data_dir = "Data"
-    temp_data_dir = "temp/Data"
+    data_dir = script_dir + "Data"
+    temp_data_dir = script_dir + "temp/Data"
 
     # Check and create /Data directory if it doesn't exist
     if not os.path.exists(data_dir):
@@ -19,5 +22,22 @@ def ensure_data_directories():
     else:
         print(f"Directory '{temp_data_dir}' already exists.")
 
-# Example usage
+def check_or_create_log():
+    # Define the filename
+    filename = "log.csv"
+    # Check if the file exists
+    if not os.path.isfile(filename):
+        # Define the headers
+        headers = ["Date", "Time", "Server", "Channel", "UserID", "Sender", "Message"]
+        
+        # Create the file and write the header
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+        
+        print(f"{filename} created with headers.")
+    else:
+        print(f"{filename} already exists.")
+
 ensure_data_directories()
+check_or_create_log()
