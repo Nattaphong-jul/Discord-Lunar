@@ -163,9 +163,10 @@ async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
     file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     try:
         # Define the source file and the decrypted destination file path
-        source_file = os.path(script_dir, 'Data', UserID, file_list[file_num - 1])
+        source_file = os.path.join(script_dir, 'Data', UserID, file_list[file_num - 1])
         decrypted_filename = encryption.decrypt(file_list[file_num - 1], UserID)
         destination_file = os.path.join(script_dir, 'temp', decrypted_filename)
+        print(destination_file)
 
         # Copy the file to the temp directory with the decrypted name
         shutil.copy(source_file, destination_file)
