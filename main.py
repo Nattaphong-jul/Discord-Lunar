@@ -134,18 +134,21 @@ async def แปล(interaction: discord.Interaction):
 
 @client.tree.command(name="list", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
 async def list(interaction: discord.Interaction):
-    UserID = str(interaction.user.id)
-    file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
-    output_list = []
-    for i in range(len(file_list)):
-        output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
+    try:
+        UserID = str(interaction.user.id)
+        file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
+        output_list = []
+        for i in range(len(file_list)):
+            output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
 
-    embed = discord.Embed(
-    title=f"__{interaction.user.name}{random.choice(happy_emoji)}__",
-    description='\n'.join(output_list),
-    color=discord.Color.orange()
-    )
-    await interaction.response.send_message(embed=embed)
+        embed = discord.Embed(
+        title=f"__{interaction.user.name}{random.choice(happy_emoji)}__",
+        description='\n'.join(output_list),
+        color=discord.Color.orange()
+        )
+        await interaction.response.send_message(embed=embed)
+    except:
+        await interaction.response.send_message(f"พี่ {interaction.user.name} ยังไม่เคยฝากไฟล์ไว้นะคะ{random.choices(sad_emoji)}")
 
 @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
 async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
