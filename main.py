@@ -14,6 +14,7 @@ import encryption
 import shutil
 import random
 import environment_folder
+import calendar_
 
 environment_folder.ensure_data_directories()
 environment_folder.check_or_create_log()
@@ -151,29 +152,29 @@ async def list(interaction: discord.Interaction):
         await interaction.response.send_message(f"พี่ {interaction.user.name} ยังไม่เคยฝากไฟล์ไว้นะคะ{random.choices(sad_emoji)}")
 
 @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
-async def ลบไฟล์(interaction: discord.Interaction, file_num: int):
+async def ลบไฟล์(interaction: discord.Interaction, เลขไฟล์: int):
     UserID = str(interaction.user.id)
     file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     try:
-        os.remove(os.path.join(script_dir, 'Data', UserID, file_list[file_num-1]))
-        await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[file_num-1], UserID)} แล้วนะคะ:thumbsup:")
+        os.remove(os.path.join(script_dir, 'Data', UserID, file_list[เลขไฟล์-1]))
+        await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[เลขไฟล์-1], UserID)} แล้วนะคะ:thumbsup:")
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
 
 @client.tree.command(name="ขอไฟล์", description="ขอไฟล์ที่ฝากใว้")
-async def ขอไฟล์(interaction: discord.Interaction, file_num: int):
+async def ขอไฟล์(interaction: discord.Interaction, เลขไฟล์: int):
     UserID = str(interaction.user.id)
     file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
     try:
         # Define the source file and the decrypted destination file path
-        source_file = os.path.join(script_dir, 'Data', UserID, file_list[file_num - 1])
-        decrypted_filename = encryption.decrypt(file_list[file_num - 1], UserID)
+        source_file = os.path.join(script_dir, 'Data', UserID, file_list[เลขไฟล์ - 1])
+        decrypted_filename = encryption.decrypt(file_list[เลขไฟล์ - 1], UserID)
         destination_file = os.path.join(script_dir, 'temp', decrypted_filename)
         print(destination_file)
 
         # Copy the file to the temp directory with the decrypted name
         shutil.copy(source_file, destination_file)
-        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(os.path.join(script_dir, 'temp', encryption.decrypt(file_list[file_num-1], UserID))))
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(os.path.join(script_dir, 'temp', encryption.decrypt(file_list[เลขไฟล์-1], UserID))))
     except:
         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
     finally:
@@ -239,6 +240,26 @@ async def id(interaction: discord.Interaction):
     color=discord.Color.orange()
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
+
+
+@client.tree.command(name="วันที่", description="แสดงปฏิทิน")
+async def วันที่(interaction: discord.Interaction,ปี: int = None, เดือนที่: int = None):
+    if เดือนที่ != None:
+        if เดือนที่ > 12:
+            await interaction.response.send_message(f"1 ปีมีแค่ 12 เดือนนะคะ {random.choice(sad_emoji)}", ephemeral=True)
+            return
+    if ปี != None:
+        if ปี < 1 or ปี > 9999:
+            await interaction.response.send_message(f"ขอที่เป็นปีที่ไม่เกิน 4 หลักด้วยค่า {random.choice(sad_emoji)}", ephemeral=True)
+            return
+    cal = calendar_.month_calendar(year=ปี, month=เดือนที่)
+
+    embed = discord.Embed(
+    title=f"__{cal[0]}__ {random.choice(happy_emoji)}",
+    description=f"```{cal[1]}```",
+    color=discord.Color.orange()
+    )
+    await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
