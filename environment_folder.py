@@ -5,8 +5,8 @@ def ensure_data_directories():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     print(f"Stored in: {script_dir}")
     # Define the paths
-    data_dir = script_dir + "Data"
-    temp_data_dir = script_dir + "temp/Data"
+    data_dir = os.path.join(script_dir, "Data")
+    temp_data_dir = os.path.join(script_dir, "temp", "Data")
 
     # Check and create /Data directory if it doesn't exist
     if not os.path.exists(data_dir):
