@@ -43,5 +43,5 @@ async def start_daily(ctx):
     await ctx.send("Daily messages started at 14:14 AM.")
 
 # Run the bot with your bot token
-from Bot_token import Token
+from Example.Bot_token import Token
 bot.run(Token)

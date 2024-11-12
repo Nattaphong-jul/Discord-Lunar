@@ -44,5 +44,5 @@ async def on_message(message):
     await bot.process_commands(message)  # Ensures commands are processed
 
 # Run the bot with your bot token
-from Bot_token import Token
+from Example.Bot_token import Token
 bot.run(Token)

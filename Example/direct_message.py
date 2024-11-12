@@ -30,5 +30,5 @@ async def dm_user(ctx, user: discord.User, *, message: str):
         await ctx.send("I can't send a DM to this user. They may have DMs disabled.")
 
 # Run the bot with your bot token
-from Bot_token import Token
+from Example.Bot_token import Token
 bot.run(Token)

@@ -264,13 +264,14 @@ async def วันที่(interaction: discord.Interaction,ปี: int = None
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
     text = f"""
-- /qr       :white_square_button: สร้าง QR Code จากลิงค์
-- /แปล      :keyboard: แกคำจากการพิมแล้วลืมเปลี่ยนภาษา
-- /list     :dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
-- /ลบไฟล์    :wastebasket: ลบไฟล์ที่ฝากใว้
-- /ขอไฟล์    :page_facing_up: ขอไฟล์ที่ฝากใว้
-- /ฝาก      :open_file_folder: ฝากไฟล์ใว้ที่ Proxima
-- /id       :identification_card: ดู User ID ของตัวเอง 
+- /qr\u2003\u2003\u2003\u2003:white_square_button: สร้าง QR Code จากลิงค์
+- /แปล\u2003\u2003\u2003:keyboard: แกคำจากการพิมแล้วลืมเปลี่ยนภาษา
+- /list\u2003\u2003\u2003\u2003:dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+- /ฝาก\u2003\u2003\u2003:open_file_folder: ฝากไฟล์ใว้ที่ Proxima
+- /ขอไฟล์\u2003\u2003:page_facing_up: ขอไฟล์ที่ฝากใว้
+- /ลบไฟล์\u2003\u2003:wastebasket: ลบไฟล์ที่ฝากใว้
+- /id\u2003\u2003\u2003\u2003:identification_card: ดู User ID ของตัวเอง
+- /วันที่\u2003\u2003\u2003:calendar_spiral: แสดงปฎิทิน
 """
     embed = discord.Embed(
     title="__Command__",
