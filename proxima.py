@@ -323,18 +323,21 @@ async def ขอตาราง(interaction: discord.Interaction,):
         except:
             return
 
-
+def space(num: int=0):
+    return " "*num
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
     text = f"""
-- /qr\u2003\u2003\u2003\u2003:white_square_button: สร้าง QR Code จากลิงค์
-- /แปล\u2003\u2003\u2003:keyboard: แกคำจากการพิมแล้วลืมเปลี่ยนภาษา
-- /list\u2003\u2003\u2003\u2003:dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
-- /ฝาก\u2003\u2003\u2003:open_file_folder: ฝากไฟล์ใว้ที่ Proxima
-- /ขอไฟล์\u2003\u2003:page_facing_up: ขอไฟล์ที่ฝากใว้
-- /ลบไฟล์\u2003\u2003:wastebasket: ลบไฟล์ที่ฝากใว้
-- /id\u2003\u2003\u2003\u2003:identification_card: ดู User ID ของตัวเอง
-- /วันที่\u2003\u2003\u2003:calendar_spiral: แสดงปฎิทิน
+- /ขอตาราง\u200B{space(29)}\u200B:calendar_spiral: ขอตารางเวลา/ตารางเรียนที่บันทึกใว้
+- /เปลี่ยนตาราง\u200B{space(22)}\u200B:pencil: เปลี่ยนตารางเวลา/ตารางเรียน
+- /qr\u200B{space(42)}\u200B:white_square_button: สร้าง QR Code จากลิงค์
+- /แปล\u200B{space(37)}\u200B:keyboard: แก้คำจากการพิมแล้วลืมเปลี่ยนภาษา
+- /list\u200B{space(40)}\u200B:dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
+- /ฝาก\u200B{space(38)}\u200B:open_file_folder: ฝากไฟล์ใว้ที่ Proxima
+- /ขอไฟล์\u200B{space(32)}\u200B:page_facing_up: ขอไฟล์ที่ฝากใว้
+- /ลบไฟล์\u200B{space(32)}\u200B:wastebasket: ลบไฟล์ที่ฝากใว้
+- /id\u200B{space(42)}\u200B:identification_card: ดู User ID ของตัวเอง
+- /วันที่\u200B{space(38)}\u200B:date: แสดงปฎิทิน
 """
     embed = discord.Embed(
     title="__Command__",
