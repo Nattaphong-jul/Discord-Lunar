@@ -251,11 +251,11 @@ async def id(interaction: discord.Interaction):
 async def วันที่(interaction: discord.Interaction,ปี: int = None, เดือนที่: int = None):
     if เดือนที่ != None:
         if เดือนที่ > 12:
-            await interaction.response.send_message(f"1 ปีมีแค่ 12 เดือนนะคะ {random.choice(sad_emoji)}", ephemeral=True)
+            await interaction.response.send_message(f"1 ปีมีแค่ 12 เดือนนะคะ {random.choice(sad_emoji)}", ephemeral=False)
             return
     if ปี != None:
         if ปี < 1 or ปี > 9999:
-            await interaction.response.send_message(f"ขอที่เป็นปีที่ไม่เกิน 4 หลักด้วยค่า {random.choice(sad_emoji)}", ephemeral=True)
+            await interaction.response.send_message(f"ขอที่เป็นปีที่ไม่เกิน 4 หลักด้วยค่า {random.choice(sad_emoji)}", ephemeral=False)
             return
     cal = calendar_.month_calendar(year=ปี, month=เดือนที่)
 
@@ -286,23 +286,42 @@ async def เปลี่ยนตาราง(interaction: discord.Interaction,
         attachment = attachment.replace("attachment = ", "")
         attachment = ast.literal_eval(attachment)
         source = os.path.join(script_dir, "temp", "Data", userID, encryption.encrypt(attachment[-1], userID))
-        print(source)
-        print(timetable_dir)
+        # print(source)
+        # print(timetable_dir)
         if len(os.listdir(timetable_dir)) > 0:
             for i in os.listdir(timetable_dir):
                 file = os.path.join(timetable_dir, i)
                 os.remove(file)
         shutil.move(src=source, dst=os.path.join(timetable_dir, encryption.encrypt(attachment[-1], userID)))
         
-        await interaction.response.send_message(f"เปลี่ยนตารางให้แล้วนะคะ {random.choice(happy_emoji)}", ephemeral=True)
+        await interaction.response.send_message(f"เปลี่ยนให้แล้วนะคะ {random.choice(happy_emoji)}", ephemeral=False)
     except:
-        await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์ใหนหนูนะคะ {random.choice(sad_emoji)}", ephemeral=True)
+        await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์ให้หนูนะคะ {random.choice(sad_emoji)}", ephemeral=False)
     
 
 
 @client.tree.command(name="ขอตาราง", description="ขอตารางเวลาหรือตารางเรียน")
 async def ขอตาราง(interaction: discord.Interaction,):
-    print(interaction.user.id)
+    UserID = str(interaction.user.id)
+    try:
+        file_list = os.listdir(os.path.join(script_dir, 'Data', UserID, "Time_Table"))
+        # Define the source file and the decrypted destination file path
+        source_file = os.path.join(script_dir, 'Data', UserID, "Time_Table", file_list[0])
+        decrypted_filename = encryption.decrypt(file_list[0], UserID)
+        destination_file = os.path.join(script_dir, 'temp', decrypted_filename)
+
+        # Copy the file to the temp directory with the decrypted name
+        shutil.copy(source_file, destination_file)
+        await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(destination_file))
+    except:
+        await interaction.response.send_message(f"พี่ยังไม่ส่งตารางมาให้หนูนะคะ {random.choice(sad_emoji)}")
+    finally:
+        # Remove the temporary file after sending
+        try:
+            if os.path.exists(destination_file):
+                os.remove(destination_file)
+        except:
+            return
 
 
 @client.tree.command(name="command", description="Command List")
