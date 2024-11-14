@@ -28,7 +28,7 @@ def check_or_create_log():
     # Check if the file exists
     if not os.path.isfile(filename):
         # Define the headers
-        headers = ["Date", "Time", "Server", "Channel", "UserID", "Sender", "Message"]
+        headers = ["Date", "Time", "Server", "Channel", "UserID", "Sender", "Message", "MessageID"]
         
         # Create the file and write the header
         with open(filename, mode='w', newline='') as file:

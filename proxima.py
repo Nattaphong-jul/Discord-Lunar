@@ -27,7 +27,7 @@ client = commands.Bot(command_prefix= "-", intents=intents)
 print(f"running on:{script_dir}")
 happy_emoji = [":grin:", ":kissing_smiling_eyes:", ":heart:", ":white_heart:", ":smiling_face_with_3_hearts:", ":point_right:"]
 sad_emoji = [":cry:", ":disappointed_relieved:", ":pleading_face:", ":pensive:", ":persevere:"]
-def write_log(message, sender, server, channel, userID):
+def write_log(message, sender, server, channel, userID, messageID):
     now = datetime.now()
     date = now.strftime("%Y-%m-%d")  # Format the date as YYYY-MM-DD
     time = now.strftime("%H:%M:%S")  # Format the time as HH:MM:SS
@@ -36,8 +36,8 @@ def write_log(message, sender, server, channel, userID):
     with open('log.csv', mode='a', newline='', encoding="utf-8") as file: # encoding="utf-8" for Thai language
         writer = csv.writer(file)
 
-        # Write a row with date, time, server ,sender, and message
-        writer.writerow([date, time, server, channel, userID, sender, message])
+        # Write a row
+        writer.writerow([date, time, server, channel, userID, sender, message, messageID])
         file.close()
 
 @client.event
@@ -56,6 +56,7 @@ async def on_message(message):
     message_ = str(message.content)
     author_ = str(message.author)
     userID_ = str(message.author.id)
+    messageID_ = str(message.id)
     if message.guild is None:
         server_ = 'DM'
         channel_ = 'DM'
@@ -64,7 +65,7 @@ async def on_message(message):
         channel_ = str(message.channel.name)
     if message.attachments:
         message_ = 'Attachment'
-    write_log(message=message_, sender=author_, server=server_, channel=channel_, userID=userID_)
+    write_log(message=message_, sender=author_, server=server_, channel=channel_, userID=userID_, messageID=messageID_)
 
     # Ignore messages from the bot itself
     if message.author == client.user:
@@ -260,6 +261,20 @@ async def วันที่(interaction: discord.Interaction,ปี: int = None
     color=discord.Color.orange()
     )
     await interaction.response.send_message(embed=embed, ephemeral=False)
+
+@client.tree.command(name="เปลี่ยนตาราง", description="เปลี่ยนตารางเวลาหรือตารางเรียน")
+async def เปลี่ยนตาราง(interaction: discord.Interaction,):
+    userID = interaction.user.id
+    timetable_dir = os.path.join(script_dir, "Data", userID, "Time_Table")
+    if not os.path.exists(timetable_dir):
+        os.makedirs(timetable_dir, exist_ok=True)
+    
+
+
+@client.tree.command(name="ขอตาราง", description="ขอตารางเวลาหรือตารางเรียน")
+async def ขอตาราง(interaction: discord.Interaction,):
+    print(interaction.user.id)
+
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
