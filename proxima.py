@@ -15,6 +15,7 @@ import shutil
 import random
 import environment_folder
 import calendar_
+import ast
 
 environment_folder.ensure_data_directories()
 environment_folder.check_or_create_log()
@@ -64,7 +65,10 @@ async def on_message(message):
         server_ = str(message.guild.name)
         channel_ = str(message.channel.name)
     if message.attachments:
-        message_ = 'Attachment'
+        attachment_list = []
+        for attachment in message.attachments:
+            attachment_list.append(attachment.filename)
+        message_ = f"attachment = {attachment_list}"
     write_log(message=message_, sender=author_, server=server_, channel=channel_, userID=userID_, messageID=messageID_)
 
     # Ignore messages from the bot itself
@@ -264,10 +268,35 @@ async def วันที่(interaction: discord.Interaction,ปี: int = None
 
 @client.tree.command(name="เปลี่ยนตาราง", description="เปลี่ยนตารางเวลาหรือตารางเรียน")
 async def เปลี่ยนตาราง(interaction: discord.Interaction,):
-    userID = interaction.user.id
-    timetable_dir = os.path.join(script_dir, "Data", userID, "Time_Table")
-    if not os.path.exists(timetable_dir):
-        os.makedirs(timetable_dir, exist_ok=True)
+    try:
+        userID = str(interaction.user.id)
+        timetable_dir = os.path.join(script_dir, "Data", userID, "Time_Table")
+        if not os.path.exists(timetable_dir):
+            os.makedirs(timetable_dir, exist_ok=True)
+
+        if interaction.guild and interaction.channel:
+            guild_name = interaction.guild.name
+            channel_name = interaction.channel.name
+            attachment = str(find_recent_message.find_recent_attachment(server=guild_name, channel=channel_name, userID=userID))
+        else:
+            guild_name = 'DM'
+            channel_name = 'DM'
+            attachment = str(find_recent_message.find_recent_attachment(server=guild_name, channel=channel_name, userID=userID))
+        
+        attachment = attachment.replace("attachment = ", "")
+        attachment = ast.literal_eval(attachment)
+        source = os.path.join(script_dir, "temp", "Data", userID, encryption.encrypt(attachment[-1], userID))
+        print(source)
+        print(timetable_dir)
+        if len(os.listdir(timetable_dir)) > 0:
+            for i in os.listdir(timetable_dir):
+                file = os.path.join(timetable_dir, i)
+                os.remove(file)
+        shutil.move(src=source, dst=os.path.join(timetable_dir, encryption.encrypt(attachment[-1], userID)))
+        
+        await interaction.response.send_message(f"เปลี่ยนตารางให้แล้วนะคะ {random.choice(happy_emoji)}", ephemeral=True)
+    except:
+        await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์ใหนหนูนะคะ {random.choice(sad_emoji)}", ephemeral=True)
     
 
 
