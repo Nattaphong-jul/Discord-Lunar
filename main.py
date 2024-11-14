@@ -149,7 +149,7 @@ async def list(interaction: discord.Interaction):
         )
         await interaction.response.send_message(embed=embed)
     except:
-        await interaction.response.send_message(f"พี่ {interaction.user.name} ยังไม่เคยฝากไฟล์ไว้นะคะ{random.choices(sad_emoji)}")
+        await interaction.response.send_message(f"พี่ {interaction.user.name} ยังไม่เคยฝากไฟล์ไว้นะคะ{random.choice(sad_emoji)}")
 
 @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
 async def ลบไฟล์(interaction: discord.Interaction, เลขไฟล์: int):
