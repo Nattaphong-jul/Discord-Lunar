@@ -1,0 +1,111 @@
+import json
+import random
+
+def json_reader(json_yt, title=""):
+    try:
+        if title == "":
+             title = f"นี่ค่ะ {random.choice([':sparkling_heart:', ':smiling_face_with_3_hearts:' ':white_heart:', ':heart:'])}"
+        result = json.loads(json_yt)
+        return f"{title}\n<https://www.youtube.com/watch?v={result['docid']}&t={int(float(result['cmt']))}>"
+    except:
+         return "หนูอ่านไม่ได้อ่ะคะ:sob:"
+
+     
+# text = str(input('Json: '))
+text = '''
+{
+  "ns": "yt",
+  "el": "detailpage",
+  "cpn": "D-0Vso7qf0hpj43B",
+  "ver": 2,
+  "cmt": "4346.62",
+  "fmt": "299",
+  "fs": "0",
+  "rt": "3653.415",
+  "euri": "",
+  "lact": 0,
+  "live": "live",
+  "cl": "725027312",
+  "mos": 0,
+  "state": "8",
+  "volume": 100,
+  "subscribed": "1",
+  "cbr": "Chrome",
+  "cbrver": "132.0.0.0",
+  "c": "WEB",
+  "cver": "2.20250206.07.00",
+  "cplayer": "UNIPLAYER",
+  "cos": "Windows",
+  "cosver": "10.0",
+  "cplatform": "DESKTOP",
+  "hl": "th_TH",
+  "cr": "TH",
+  "fexp": "v1,23986024,18620,434717,60173,67153,133212,14625955,11684381,43454,9954,9105,18310,4420,2821,2870,56242,19100,8479,19339,18644,13046,1823,10892,6942,408,20473,8,8487,2144,9243,1581,1690,14,452,65,3426,2,120,1242,808,4903,3025,391,8511,4263,5964,983,2178,4605,9252,3479,2024,262,233,5815,916,269,2550,961,3672,4343,1892,271,163,6405,207,3189,506,282,1289,987,238,1260,4257,1242,2056,6018,2808",
+  "afmt": "140",
+  "lio": "1739286112.201",
+  "muted": "0",
+  "docid": "XEV84cz3UfM",
+  "ei": "F2mrZ8bODred1d8PpbeTwA8",
+  "plid": "AAYt30RPegQ3uRyE",
+  "referrer": "https://www.youtube.com/",
+  "sdetail": "p:/",
+  "sourceid": "y",
+  "of": "PwUq51tuN9aSeJD7aHMu7w",
+  "osid": "AAAAAbDxZGU:AOeUNAYhRFfsvcFq0mIY_OpTy3yODk7vNw",
+  "vm": "CAEQARgEOjJBSHFpSlRJSkpZSjFhc1BMN1gwb2dsSW5fb2o4R3dvMTJLNXlYRWI5elRSUXpBTmdPUWJaQUZVQTZSU3hoYVNWT1pQMVhCUWc3SHRtb2h0bDhFVmM2dW1YQ2ljWmx0OUQydE51ZmFmcF91S0FPUzc1a3ppN3IyLTl4c1FueUtlb29ILVkxYW41QTJfMDFn",
+  "vct": "4346.620",
+  "vd": "7890.219",
+  "vpl": "3856.100-4017.855,4030.100-4080.901,4082.100-4346.620",
+  "vbu": "3938.000-4020.000,4030.000-4348.417",
+  "vbs": "0.000-7890.219",
+  "vpa": "0",
+  "vsk": "0",
+  "ven": "0",
+  "vpr": "1",
+  "vrs": "4",
+  "vns": "2",
+  "vec": "null",
+  "vemsg": "",
+  "vvol": "1",
+  "vdom": "1",
+  "vsrc": "1",
+  "vw": "1280",
+  "vh": "720",
+  "lct": "4346.568",
+  "lsk": false,
+  "lmf": false,
+  "lbw": "25718460.171",
+  "lhd": "0.013",
+  "lst": "0.000",
+  "laa": "itag_140_type_3_src_updateWithEmsg_segsrc_updateWithEmsg_seg_2174_time_4348.0-4350.0_off_8802_len_458",
+  "lva": "itag_299_type_3_src_updateWithEmsg_segsrc_updateWithEmsg_seg_2174_time_4348.0-4350.0_off_251489_len_9667",
+  "lar": "itag_140_type_3_src_mlLiveCreateReqInfoForSeg_segsrc_mlLiveCreateReqInfoForSeg_seg_2175_time_4350.0-4352.0_off_0_len_36000_end_1",
+  "lvr": "itag_299_type_3_src_mlLiveCreateReqInfoForSeg_segsrc_mlLiveCreateReqInfoForSeg_seg_2175_time_4350.0-4352.0_off_0_len_1286050_end_1",
+  "laq": "72000",
+  "lvq": "2572100",
+  "lab": "3594.797-3610.006,3615.997-3644.000,3647.994-3713.985,3749.999-3753.993,3855.999-4020.001,4029.986-4348.424",
+  "lvb": "3938.000-4020.000,4030.000-4348.417",
+  "ismb": 24130000,
+  "latency_class": "LOW",
+  "lowlatency": "1",
+  "segduration": 2,
+  "lat": 2.162888526916504,
+  "relative_loudness": "NaN",
+  "optimal_format": "1080p60",
+  "user_qual": 2160,
+  "release_version": "youtube.player.web_20250209_00_RC00",
+  "debugvideoId": "XEV84cz3UfM",
+  "0sz": "false",
+  "op": "",
+  "yof": "false",
+  "dis": "",
+  "gpu": "ANGLE(NVIDIA,_NVIDIA_GeForce_RTX4090(0x00002684)_Direct3D11_vs_5_0_ps_5_0,_D3D11)",
+  "ps": "desktop-polymer",
+  "debug_playbackQuality": "hd1080",
+  "debug_date": "Tue Feb 11 2025 23:14:25 GMT+0700 (Indochina Time)",
+  "origin": "https://www.youtube.com/",
+  "timestamp": 1739290465520
+}
+'''
+title = str(input('Title: '))
+print(json_reader(text, title))
