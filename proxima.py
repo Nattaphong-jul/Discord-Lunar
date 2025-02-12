@@ -329,13 +329,15 @@ def space(num: int=0):
 import json
 def json_url(json_yt, title=""):
     try:
-        if title == "":
+        print(title)
+        if title == 'None' or title == None:
              title = f"นี่ค่ะ {random.choice([':sparkling_heart:', ':smiling_face_with_3_hearts:' ':white_heart:', ':heart:'])}"
         result = json.loads(json_yt)
-        return f"{title}\n<https://www.youtube.com/watch?v={result['docid']}&t={int(float(result['cmt']))}>"
+        print(title)
+        return f"__{title}__\n<https://www.youtube.com/watch?v={result['docid']}&t={int(float(result['cmt']))}>"
     except:
          return "หนูอ่านไม่ได้อ่ะคะ:sob:"
-@client.tree.command(name="YouTube Json", description="Translate Json script from YouTube to URL with Timestamp and Title")
+@client.tree.command(name="ytjson", description="Translate Json script from YouTube to URL with Timestamp and Title")
 async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str = None):
     await interaction.channel.purge(limit=1)
     await interaction.response.send_message(json_url(json_yt, title))
