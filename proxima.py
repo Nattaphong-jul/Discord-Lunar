@@ -339,7 +339,6 @@ def json_url(json_yt, title=""):
          return "หนูอ่านไม่ได้อ่ะคะ:sob:"
 @client.tree.command(name="ytjson", description="Translate Json script from YouTube to URL with Timestamp and Title")
 async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str = None):
-    await interaction.channel.purge(limit=1)
     await interaction.response.send_message(json_url(json_yt, title))
 
 
