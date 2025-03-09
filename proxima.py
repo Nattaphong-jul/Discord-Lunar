@@ -19,7 +19,8 @@ import ast
 
 environment_folder.ensure_data_directories()
 environment_folder.check_or_create_log()
-Token = 'MTI5MzU5MjkxOTM1NzUyMjAzMQ.GE9NAe.FJUVqJu8NM22ofLVAZL0TNHZtiTXpjZ_th2ed4'
+with open("token.txt", "r") as  file:
+    Token = file.read()
 intents = discord.Intents.default()
 intents.message_content = True
 intents.voice_states = True

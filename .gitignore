@@ -2,3 +2,4 @@ Data/
 temp/
 __pycache__/
 log.csv
+token.txt
