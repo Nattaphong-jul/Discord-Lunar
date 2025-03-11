@@ -268,36 +268,25 @@ async def วันที่(interaction: discord.Interaction,ปี: int = None
     await interaction.response.send_message(embed=embed, ephemeral=False)
 
 @client.tree.command(name="เปลี่ยนตาราง", description="เปลี่ยนตารางเวลาหรือตารางเรียน")
-async def เปลี่ยนตาราง(interaction: discord.Interaction,):
-    try:
-        userID = str(interaction.user.id)
-        timetable_dir = os.path.join(script_dir, "Data", userID, "Time_Table")
-        if not os.path.exists(timetable_dir):
-            os.makedirs(timetable_dir, exist_ok=True)
+async def เปลี่ยนตาราง(interaction: discord.Interaction, attachment: discord.Attachment):
+        if attachment.content_type.startswith("image"):
+            # Save the image locally
+            userID = str(interaction.user.id)
+            timetable_dir = os.path.join(script_dir, "Data", userID, "Time_Table")
+            file_path = os.path.join(timetable_dir, encryption.encrypt(attachment.filename, userID))
 
-        if interaction.guild and interaction.channel:
-            guild_name = interaction.guild.name
-            channel_name = interaction.channel.name
-            attachment = str(find_recent_message.find_recent_attachment(server=guild_name, channel=channel_name, userID=userID))
+            if not os.path.exists(timetable_dir):  # Make folder if does not exist
+                os.makedirs(timetable_dir, exist_ok=True)
+
+            if len(os.listdir(timetable_dir)) > 0:
+                for i in os.listdir(timetable_dir):
+                    file = os.path.join(timetable_dir, i)
+                    os.remove(file)  
+
+            await attachment.save(file_path)      
+            await interaction.response.send_message(f"เปลี่ยนให้แล้วนะคะ {random.choice(happy_emoji)}", ephemeral=False)
         else:
-            guild_name = 'DM'
-            channel_name = 'DM'
-            attachment = str(find_recent_message.find_recent_attachment(server=guild_name, channel=channel_name, userID=userID))
-        
-        attachment = attachment.replace("attachment = ", "")
-        attachment = ast.literal_eval(attachment)
-        source = os.path.join(script_dir, "temp", "Data", userID, encryption.encrypt(attachment[-1], userID))
-        # print(source)
-        # print(timetable_dir)
-        if len(os.listdir(timetable_dir)) > 0:
-            for i in os.listdir(timetable_dir):
-                file = os.path.join(timetable_dir, i)
-                os.remove(file)
-        shutil.move(src=source, dst=os.path.join(timetable_dir, encryption.encrypt(attachment[-1], userID)))
-        
-        await interaction.response.send_message(f"เปลี่ยนให้แล้วนะคะ {random.choice(happy_emoji)}", ephemeral=False)
-    except:
-        await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์ให้หนูนะคะ {random.choice(sad_emoji)}", ephemeral=False)
+            await interaction.response.send_message("Please upload an image file.", ephemeral=True)
     
 
 
