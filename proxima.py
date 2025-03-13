@@ -330,6 +330,14 @@ def json_url(json_yt, title="", subtractor=0):
 async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str = None, subtractor: discord.app_commands.Range[int, 0, None] = 0):
     await interaction.response.send_message(json_url(json_yt, title, subtractor))
 
+@client.tree.command(name="calculatebills", description="Calculate bill for all member from google sheet")
+async def bills(interaction: discord.Interaction):
+        from billcal import calculate_bill
+        await interaction.response.send_message(calculate_bill(), ephemeral=False)
+
+@client.tree.command(name="billsheet", description="Show Google Sheet for bills calculation")
+async def bill_sheet(interaction: discord.Interaction):
+        await interaction.response.send_message("[Bills Google Sheet](https://docs.google.com/spreadsheets/d/1y8rZlKght5j9bNIxx9lbTGQc7CQa_YiUUIHV-CIO2nM/edit?usp=sharing)", ephemeral=False)
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
