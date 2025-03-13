@@ -333,7 +333,12 @@ async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str 
 @client.tree.command(name="calculatebills", description="Calculate bill for all member from google sheet")
 async def bills(interaction: discord.Interaction):
         from billcal import calculate_bill
-        await interaction.response.send_message(calculate_bill(), ephemeral=False)
+        embed = discord.Embed(
+        # title="",
+        description=calculate_bill(),
+        color=discord.Color.orange()
+        )
+        await interaction.response.send_message(embed=embed)
 
 @client.tree.command(name="billsheet", description="Show Google Sheet for bills calculation")
 async def bill_sheet(interaction: discord.Interaction):
