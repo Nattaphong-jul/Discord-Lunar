@@ -32,7 +32,9 @@ def calculate_bill():
                 total = total + price
 
         if bill['Additional'][0] != 0: # Check if any additional cost
-            result = f"{result}\nAdditional: {round_up(bill['Additional'][0]/len(member))}"
+            additional = round_up(bill['Additional'][0]/len(member))
+            result = f"{result}\n-# Additional: {additional}"
+            total = total + additional # Add the additional value ex.VAT to the total
         all_total = all_total + total
         result = f"{result}\n**Total**: {total}\n{"-"*20}"
         calculated_result = calculated_result + result + '\n'
