@@ -7,6 +7,10 @@ def calculate_bill():
     bill = pd.read_csv(url) # Read google sheet
     # print(bill)
 
+    # Fill NaN value with the value
+    bill['Amount'] = bill['Amount'].fillna(1)
+    bill['Additional'] = bill['Additional'].fillna(0)
+
     member = set([name for i in bill['People Name'].to_list() for name in i.split()])
     # print(member)
 
@@ -36,8 +40,8 @@ def calculate_bill():
             result = f"{result}\n-# Additional: {additional}"
             total = total + additional # Add the additional value ex.VAT to the total
         all_total = all_total + total
-        result = f"{result}\n**Total**: {total}\n{"-"*20}"
+        result = f"{result}\n**Total**: {total}\n{'-'*20}"
         calculated_result = calculated_result + result + '\n'
-    calculated_result = calculated_result + f"**Grand Total** = {all_total + bill['Additional'][0]}\n-# Any decimal amount in the bill will be rounded up"
+    calculated_result = calculated_result + f"**Grand Total** = {all_total}\n-# Any decimal amount in the bill will be rounded up"
 
     return calculated_result

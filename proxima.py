@@ -42,6 +42,14 @@ def write_log(message, sender, server, channel, userID, messageID):
         writer.writerow([date, time, server, channel, userID, sender, message, messageID])
         file.close()
 
+
+class LinkToBills(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        # Add a URL button
+        self.add_item(discord.ui.Button(label="Edit Bills", url="https://docs.google.com/spreadsheets/d/1y8rZlKght5j9bNIxx9lbTGQc7CQa_YiUUIHV-CIO2nM/edit?usp=sharing"))
+
+
 @client.event
 async def on_ready():
     print("Proxima is ready")
@@ -332,13 +340,16 @@ async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str 
 
 @client.tree.command(name="calculatebills", description="Calculate bill for all member from google sheet")
 async def bills(interaction: discord.Interaction):
-        from billcal import calculate_bill
-        embed = discord.Embed(
-        # title="",
-        description=calculate_bill(),
-        color=discord.Color.orange()
-        )
-        await interaction.response.send_message(embed=embed)
+        try:
+            from billcal import calculate_bill
+            embed = discord.Embed(
+            # title="",
+            description=calculate_bill(),
+            color=discord.Color.orange()
+            )
+            await interaction.response.send_message(embed=embed)
+        except:
+            await interaction.response.send_message(f"ใส่ข้อมูลให้ครบด้วยนะคะ{random.choice(sad_emoji)}", view=LinkToBills)
 
 @client.tree.command(name="billsheet", description="Show Google Sheet for bills calculation")
 async def bill_sheet(interaction: discord.Interaction):
