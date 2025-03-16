@@ -134,7 +134,6 @@ async def qr(interaction: discord.Interaction, url: str):
     except:
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
 
-
 @client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษาจากข้อความล่าสุด")
 async def แปล(interaction: discord.Interaction):
         if interaction.guild and interaction.channel:
@@ -147,106 +146,6 @@ async def แปล(interaction: discord.Interaction):
             userID = interaction.user.id
             await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name, userID=userID)), ephemeral=False)
 
-# @client.tree.command(name="list", description="แสดงไฟล์ที่ฝากใว้ทั้งหมด")
-# async def list(interaction: discord.Interaction):
-#     try:
-#         UserID = str(interaction.user.id)
-#         file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
-#         output_list = []
-#         for i in range(len(file_list)):
-#             output_list.append(f"[{i+1}]    {encryption.decrypt(file_list[i], UserID)}")
-
-#         embed = discord.Embed(
-#         title=f"__{interaction.user.name}{random.choice(happy_emoji)}__",
-#         description='\n'.join(output_list),
-#         color=discord.Color.orange()
-#         )
-#         await interaction.response.send_message(embed=embed)
-#     except:
-#         await interaction.response.send_message(f"พี่ {interaction.user.name} ยังไม่เคยฝากไฟล์ไว้นะคะ{random.choice(sad_emoji)}")
-
-# @client.tree.command(name="ลบไฟล์", description="ลบไฟล์ที่ฝากใว้")
-# async def ลบไฟล์(interaction: discord.Interaction, เลขไฟล์: int):
-#     UserID = str(interaction.user.id)
-#     file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
-#     try:
-#         os.remove(os.path.join(script_dir, 'Data', UserID, file_list[เลขไฟล์-1]))
-#         await interaction.response.send_message(f"ลบไฟล์ {encryption.decrypt(file_list[เลขไฟล์-1], UserID)} แล้วนะคะ:thumbsup:")
-#     except:
-#         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
-
-# @client.tree.command(name="ขอไฟล์", description="ขอไฟล์ที่ฝากใว้")
-# async def ขอไฟล์(interaction: discord.Interaction, เลขไฟล์: int):
-#     UserID = str(interaction.user.id)
-#     file_list = os.listdir(os.path.join(script_dir, 'Data', UserID))
-#     try:
-#         # Define the source file and the decrypted destination file path
-#         source_file = os.path.join(script_dir, 'Data', UserID, file_list[เลขไฟล์ - 1])
-#         decrypted_filename = encryption.decrypt(file_list[เลขไฟล์ - 1], UserID)
-#         destination_file = os.path.join(script_dir, 'temp', decrypted_filename)
-#         print(destination_file)
-
-#         # Copy the file to the temp directory with the decrypted name
-#         shutil.copy(source_file, destination_file)
-#         await interaction.response.send_message(f"นี่ค่ะ{random.choice(happy_emoji)}", file=discord.File(os.path.join(script_dir, 'temp', encryption.decrypt(file_list[เลขไฟล์-1], UserID))))
-#     except:
-#         await interaction.response.send_message(f"ไม่เจอไฟล์นั้นนะคะ:pleading_face:")
-#     finally:
-#         # Remove the temporary file after sending
-#         if os.path.exists(destination_file):
-#             os.remove(destination_file)
-
-# @client.tree.command(name="ฝาก", description="ฝากไฟล์ใว้ที่ Proxima")
-# async def ฝาก(interaction: discord.Interaction):
-#     try:
-#         path = os.path.join(script_dir, 'temp', 'Data', str(interaction.user.id))
-#         havefile = os.listdir(path)
-#         moved_file = []
-#         remaining = []
-#         if len(havefile) >= 1:
-#             dest_dir = os.path.join(script_dir, 'Data', str(interaction.user.id))
-#             if not os.path.exists(dest_dir):
-#                 os.makedirs(dest_dir)
-
-#             # Iterate over all files in the source directory
-#             for filename in os.listdir(path):
-#                 src_path = os.path.join(path, filename)
-#                 dest_path = os.path.join(dest_dir, filename)
-
-#                 # Check if it's a file before moving (ignoring subdirectories)
-#                 if os.path.isfile(src_path):
-#                     file_size = os.path.getsize(src_path)  / (1024 * 1024)
-#                     if file_size < 8:
-#                         shutil.move(src_path, dest_path)
-#                         print(f"Moved {filename} to {dest_dir}")
-#                         moved_file.append(":ballot_box_with_check:  " + encryption.decrypt(filename, str(interaction.user.id)))
-#                     else:
-#                         os.remove(src_path)
-#                         remaining.append(":exclamation:  ~~" + encryption.decrypt(filename, str(interaction.user.id)) + "~~")     
-
-#         else:
-#             await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์มาให้หนูนะคะ{random.choice(sad_emoji)}")
-#             return
-
-#         if len(remaining) < 1:
-#             embed = discord.Embed(
-#             title=f"__{interaction.user.name}__",
-#             description='\n'.join(moved_file),
-#             color=discord.Color.orange()
-#             )
-#             await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
-#         else:
-#             embed = discord.Embed(
-#             title=f"__{interaction.user.name}__",
-#             description='\n'.join(moved_file) ,
-#             color=discord.Color.orange()
-#             )
-#             embed.add_field(name=f"**ไฟล์นี้เกิน 8MB นะคะ{random.choice(sad_emoji)}**", value='\n'.join(remaining), inline=False)
-#             await interaction.response.send_message(f"เพิ่มไฟล์ให้แล้วนะคะ{random.choice(happy_emoji)}", embed=embed)
-#     except:
-#         await interaction.response.send_message(f"พี่ยังไม่ได้ส่งไฟล์มาให้หนูนะคะ{random.choice(sad_emoji)}")
-
-
 @client.tree.command(name="id", description="ดู User ID ของตัวเอง")
 async def id(interaction: discord.Interaction):
     embed = discord.Embed(
@@ -254,7 +153,6 @@ async def id(interaction: discord.Interaction):
     color=discord.Color.orange()
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
-
 
 @client.tree.command(name="วันที่", description="แสดงปฏิทิน")
 async def วันที่(interaction: discord.Interaction,ปี: int = None, เดือนที่: int = None):
@@ -349,11 +247,11 @@ async def bills(interaction: discord.Interaction):
             )
             await interaction.response.send_message(embed=embed)
         except:
-            await interaction.response.send_message(f"ใส่ข้อมูลให้ครบด้วยนะคะ{random.choice(sad_emoji)}", view=LinkToBills)
+            await interaction.response.send_message(f"ใส่ข้อมูลให้ครบด้วยนะคะ{random.choice(sad_emoji)}", view=LinkToBills())
 
 @client.tree.command(name="billsheet", description="Show Google Sheet for bills calculation")
 async def bill_sheet(interaction: discord.Interaction):
-        await interaction.response.send_message("[Bills Google Sheet](https://docs.google.com/spreadsheets/d/1y8rZlKght5j9bNIxx9lbTGQc7CQa_YiUUIHV-CIO2nM/edit?usp=sharing)", ephemeral=False)
+        await interaction.response.send_message(f"นี่ค่ะ:point_right:", view=LinkToBills())
 
 @client.tree.command(name="command", description="Command List")
 async def command(interaction: discord.Interaction):
@@ -362,10 +260,6 @@ async def command(interaction: discord.Interaction):
 - /เปลี่ยนตาราง\u200B{space(22)}\u200B:pencil: เปลี่ยนตารางเวลา/ตารางเรียน
 - /qr\u200B{space(42)}\u200B:white_square_button: สร้าง QR Code จากลิงค์
 - /แปล\u200B{space(37)}\u200B:keyboard: แก้คำจากการพิมแล้วลืมเปลี่ยนภาษา
-- /list\u200B{space(40)}\u200B:dividers: แสดงรายการไฟลที่ฝากใว้ทั้งหมด
-- /ฝาก\u200B{space(38)}\u200B:open_file_folder: ฝากไฟล์ใว้ที่ Proxima
-- /ขอไฟล์\u200B{space(32)}\u200B:page_facing_up: ขอไฟล์ที่ฝากใว้
-- /ลบไฟล์\u200B{space(32)}\u200B:wastebasket: ลบไฟล์ที่ฝากใว้
 - /id\u200B{space(42)}\u200B:identification_card: ดู User ID ของตัวเอง
 - /วันที่\u200B{space(38)}\u200B:date: แสดงปฎิทิน
 """
