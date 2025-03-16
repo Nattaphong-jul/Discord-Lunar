@@ -37,7 +37,10 @@ def calculate_bill():
 
         if bill['Additional'][0] != 0: # Check if any additional cost
             additional = round_up(bill['Additional'][0]/len(member))
-            result = f"{result}\n-# Additional: {additional}"
+            if not pd.isna(bill['Additional Description'][0]):
+                result = f"{result}\n-# {bill['Additional Description'][0]}: {additional}"
+            else:
+                result = f"{result}\n-# Additional: {additional}"
             total = total + additional # Add the additional value ex.VAT to the total
         all_total = all_total + total
         result = f"{result}\n**Total**: {total}\n{'-'*20}"

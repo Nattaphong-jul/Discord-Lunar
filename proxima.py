@@ -236,38 +236,21 @@ def json_url(json_yt, title="", subtractor=0):
 async def YoutubeJson(interaction: discord.Interaction,json_yt: str, title: str = None, subtractor: discord.app_commands.Range[int, 0, None] = 0):
     await interaction.response.send_message(json_url(json_yt, title, subtractor))
 
-@client.tree.command(name="calculatebills", description="Calculate bill for all member from google sheet")
-async def bills(interaction: discord.Interaction):
+@client.tree.command(name="คิดบิล", description="แสดงบิลที่คำนวนแล้วจาก Google Sheet")
+async def bills(interaction: discord.Interaction, restarant: str = ""):
         try:
             from billcal import calculate_bill
             embed = discord.Embed(
-            # title="",
+            title=restarant,
             description=calculate_bill(),
             color=discord.Color.orange()
             )
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=embed, view=LinkToBills())
         except:
             await interaction.response.send_message(f"ใส่ข้อมูลให้ครบด้วยนะคะ{random.choice(sad_emoji)}", view=LinkToBills())
 
-@client.tree.command(name="billsheet", description="Show Google Sheet for bills calculation")
+@client.tree.command(name="บิล", description="แสดงลิงค์ Google Sheet เพื่อกรอกข้อมูลในการคำนวนบิล")
 async def bill_sheet(interaction: discord.Interaction):
         await interaction.response.send_message(f"นี่ค่ะ:point_right:", view=LinkToBills())
-
-@client.tree.command(name="command", description="Command List")
-async def command(interaction: discord.Interaction):
-    text = f"""
-- /ขอตาราง\u200B{space(29)}\u200B:calendar_spiral: ขอตารางเวลา/ตารางเรียนที่บันทึกใว้
-- /เปลี่ยนตาราง\u200B{space(22)}\u200B:pencil: เปลี่ยนตารางเวลา/ตารางเรียน
-- /qr\u200B{space(42)}\u200B:white_square_button: สร้าง QR Code จากลิงค์
-- /แปล\u200B{space(37)}\u200B:keyboard: แก้คำจากการพิมแล้วลืมเปลี่ยนภาษา
-- /id\u200B{space(42)}\u200B:identification_card: ดู User ID ของตัวเอง
-- /วันที่\u200B{space(38)}\u200B:date: แสดงปฎิทิน
-"""
-    embed = discord.Embed(
-    title="__Command__",
-    description=text,
-    color=discord.Color.orange()
-    )
-    await interaction.response.send_message(embed=embed)
 
 client.run(Token)
