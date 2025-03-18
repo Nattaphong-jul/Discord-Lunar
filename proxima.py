@@ -253,4 +253,31 @@ async def bills(interaction: discord.Interaction, restarant: str = ""):
 async def bill_sheet(interaction: discord.Interaction):
         await interaction.response.send_message(f"นี่ค่ะ:point_right:", view=LinkToBills())
 
+
+from PIL import Image
+import pytesseract
+# Set the Tesseract executable path based on the OS
+if os.name == 'nt':  # Check if it's Windows
+    pytesseract.pytesseract.tesseract_cmd = os.path.join(script_dir, 'tess', 'tesseract.exe')
+elif os.name == 'posix':  # Check if it's Linux/Ubuntu
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+
+@client.tree.command(name="imgtext", description="เปลี่ยนรูปเป็นข้อความ")
+async def imagetotext(interaction: discord.Interaction, attachment: discord.Attachment):
+        if attachment.content_type.startswith("image"):
+            # Save the image locally
+            file_path = os.path.join(script_dir, 'temp', attachment.filename)
+            await attachment.save(file_path)
+
+            embed = discord.Embed(
+            title=random.choice(happy_emoji),
+            description=f"```{pytesseract.image_to_string(Image.open(file_path))}```",
+            color=discord.Color.orange()
+            )
+            await interaction.response.send_message(embed=embed)  
+            os.remove(file_path)
+
+        else:
+            await interaction.response.send_message(f"อัพโหลดรูปด้วยนะคะ{random.choice(sad_emoji)}", ephemeral=True)
+
 client.run(Token)
