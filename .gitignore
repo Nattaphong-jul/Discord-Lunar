@@ -1,7 +1,7 @@
 Data/
 temp/
 __pycache__/
+tess/
 log.csv
 token.txt
 qrcode.png
-tess/
