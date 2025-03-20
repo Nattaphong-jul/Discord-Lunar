@@ -262,22 +262,60 @@ if os.name == 'nt':  # Check if it's Windows
 elif os.name == 'posix':  # Check if it's Linux/Ubuntu
     pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
 
+
+def resize_image_if_needed(image_path, output_path, max_pixels=5_000_000):
+    with Image.open(image_path) as img:
+        width, height = img.size
+        total_pixels = width * height
+
+        if total_pixels > max_pixels:
+            scale_factor = (max_pixels / total_pixels) ** 0.5
+            new_width = int(width * scale_factor)
+            new_height = int(height * scale_factor)
+
+            img = img.resize((new_width, new_height), Image.LANCZOS)
+            img.convert("RGB").save(output_path, "JPEG")
+            # img.save(output_path)
+            print(f"Resized image to {new_width}x{new_height}")
+            print(f"{image_path} -> {output_path}")
+        else:
+            img.convert("RGB").save(output_path, "JPEG")
+            print("Image is within the allowed pixel limit.")
+        # print(output_path)
+        return output_path
+
 @client.tree.command(name="imgtext", description="เปลี่ยนรูปเป็นข้อความ")
-async def imagetotext(interaction: discord.Interaction, attachment: discord.Attachment):
+@discord.app_commands.describe(attachment="Upload the image", language="[en, th]")
+async def imagetotext(interaction: discord.Interaction, attachment: discord.Attachment, language: str = 'en'):
+        if language == 'en':
+            language = 'eng'
+        elif language == 'th':
+            language = 'tha'
+        else:
+            language = 'eng'
+
         if attachment.content_type.startswith("image"):
+            await interaction.response.defer()
             # Save the image locally
             file_path = os.path.join(script_dir, 'temp', attachment.filename)
-            await attachment.save(file_path)
+            await attachment.save(file_path) 
+            
+            # output_path = os.path.join(script_dir, 'temp', img_path.split('\\')[-1])
+            output_path = os.path.join(script_dir, 'temp', 'img.jpg')
+            text = pytesseract.image_to_string(Image.open(resize_image_if_needed(file_path, output_path)), lang=language, timeout=30)
+            
 
             embed = discord.Embed(
             title=random.choice(happy_emoji),
-            description=f"```{pytesseract.image_to_string(Image.open(file_path))}```",
+            description=f"```{str(text)}```",
             color=discord.Color.orange()
             )
-            await interaction.response.send_message(embed=embed)  
+
             os.remove(file_path)
+            os.remove(output_path)
+            await interaction.followup.send(embed=embed)
 
         else:
-            await interaction.response.send_message(f"อัพโหลดรูปด้วยนะคะ{random.choice(sad_emoji)}", ephemeral=True)
+            await interaction.response.send_message("Please upload an image file.", ephemeral=True)
 
 client.run(Token)
