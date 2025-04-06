@@ -318,4 +318,30 @@ async def imagetotext(interaction: discord.Interaction, attachment: discord.Atta
         else:
             await interaction.response.send_message("Please upload an image file.", ephemeral=True)
 
+
+async def save_chat_history(channel: discord.TextChannel, limit: int = 100):
+    filename: str = os.path.join(script_dir, 'temp', "chat_history.txt")
+    messages = []
+    async for message in channel.history(limit=limit, oldest_first=True):
+        # messages.append(f"[{message.created_at}] {message.author.name}: {message.content}")
+        messages.append(f"{message.content}")
+
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write("\n\n".join(messages))
+
+destination_file = os.path.join(script_dir, 'temp', "chat_history.txt")
+@client.tree.command(name="savechat", description="บันทึกทุกข้อความใน Channel เป็น txt")
+@discord.app_commands.describe(limit="Limit of the history")
+async def save_chat(interaction: discord.Interaction, limit: int = 1000):
+    await interaction.response.defer(thinking=True)
+    await save_chat_history(interaction.channel, limit=limit)
+    await interaction.followup.send(f"นี่ค่ะ :point_down:", file=discord.File(destination_file))
+    # Remove the temporary file after sending
+    try:
+        if os.path.exists(destination_file):
+            os.remove(destination_file)
+    except:
+        return
+
+
 client.run(Token)
