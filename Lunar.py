@@ -413,9 +413,9 @@ def save_sleep(usermention: str, sleep_duration: int):
 
     formatted = datetime.fromtimestamp(awake_time).strftime("%H:%M")
     if updated:
-        return f"Your sleep time has been updated. You'll now wake up at {formatted} 😴"
+        return f"ฝันดีค่ะ ({formatted}) 😴"
     else:
-        return f"You will be awake at {formatted} :zzz:"
+        return f"ฝันดีค่ะ ({formatted}) :zzz:"
 
 
 @client.tree.command(name="sleep", description="If someone mentions you, I'll tell them you're sleeping 😴")
@@ -451,9 +451,9 @@ async def awake(interaction: discord.Interaction):
 
     # Respond
     if removed:
-        await interaction.response.send_message("You're awake! ☀️", ephemeral=True)
+        await interaction.response.send_message("อรุณสวัสดิ์ค่ะ ☀️", ephemeral=True)
     else:
-        await interaction.response.send_message("You're not marked as sleeping 🧐", ephemeral=True)
+        await interaction.response.send_message("หนูยังไม่รู้เลยนะคะว่าพี่นอน 😅", ephemeral=True)
 
 
 client.run(Token)
