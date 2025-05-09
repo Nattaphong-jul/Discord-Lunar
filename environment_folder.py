@@ -39,5 +39,23 @@ def check_or_create_log():
     else:
         print(f"{filename} already exists.")
 
+def check_or_sleep_data():
+    # Define the filename
+    filename = "sleep_data.csv"
+    # Check if the file exists
+    if not os.path.isfile(filename):
+        # Define the headers
+        headers = ["usermention", "time_sleep", "time_awake"]
+        
+        # Create the file and write the header
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+        
+        print(f"{filename} created with headers.")
+    else:
+        print(f"{filename} already exists.")
+
 ensure_data_directories()
 check_or_create_log()
+check_or_sleep_data()

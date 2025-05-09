@@ -52,7 +52,7 @@ class LinkToBills(discord.ui.View):
 
 @client.event
 async def on_ready():
-    print("Proxima is ready")
+    print("Lunar is ready")
     try:
         # Sync the commands with Discord (in case you add new commands)
         synced = await client.tree.sync()
@@ -83,6 +83,42 @@ async def on_message(message):
     # Ignore messages from the bot itself
     if message.author == client.user:
         return
+
+
+    sleeping_users = []
+    updated_rows = []
+
+    # Load and clean sleep data
+    if os.path.isfile("sleep_data.csv"):
+        with open("sleep_data.csv", mode='r', encoding="utf-8") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if not any(row) or row[0] == "usermention":
+                    continue
+
+                usermention = row[0]
+                try:
+                    awake_time = float(row[2])
+                except (IndexError, ValueError):
+                    continue  # Skip malformed lines
+
+                if time.time() < awake_time:
+                    # Still sleeping → keep in CSV
+                    updated_rows.append(row)
+                    sleeping_users.append(usermention)
+                # Else: their time passed → do not keep them
+
+        # Rewrite the cleaned CSV (no expired entries)
+        with open("sleep_data.csv", mode='w', newline='', encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(["usermention", "time_sleep", "time_awake"])
+            writer.writerows(updated_rows)
+
+    # Now check if someone mentioned a sleeping user
+    for user in message.mentions:
+        if user.mention in sleeping_users:
+            await message.channel.send(random.choice(["นอนแล้วค่ะ 😴", "หลับไปแล้วค่ะ 💤"]))
+            break
 
     if message.attachments:
         # download_dir = fr'{script_dir}/temp/Data/{message.author.id}'
@@ -342,6 +378,82 @@ async def save_chat(interaction: discord.Interaction, limit: int = 1000):
             os.remove(destination_file)
     except:
         return
+
+def save_sleep(usermention: str, sleep_duration: int):
+    sleep_time = time.time()
+    awake_time = sleep_time + sleep_duration * 3600  # Convert to seconds
+
+    updated = False
+    new_rows = []
+
+    # Try to read and update if user already exists
+    try:
+        with open('sleep_data.csv', mode='r', encoding="utf-8") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if not any(row):  # 🚫 Skip blank rows
+                    continue
+                if row[0] == "usermention":  # 🚫 Skip header row if it exists
+                    continue
+                if row[0] == usermention:
+                    new_rows.append([usermention, sleep_time, awake_time])
+                    updated = True
+                else:
+                    new_rows.append(row)
+    except FileNotFoundError:
+        pass  # If the file doesn't exist yet, we'll just create it below
+
+    # Write the new data back (overwrite)
+    with open('sleep_data.csv', mode='w', newline='', encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["usermention", "time_sleep", "time_awake"])  # Optional header
+        if not updated:
+            new_rows.append([usermention, sleep_time, awake_time])
+        writer.writerows(new_rows)
+
+    formatted = datetime.fromtimestamp(awake_time).strftime("%H:%M")
+    if updated:
+        return f"Your sleep time has been updated. You'll now wake up at {formatted} 😴"
+    else:
+        return f"You will be awake at {formatted} :zzz:"
+
+
+@client.tree.command(name="sleep", description="If someone mentions you, I'll tell them you're sleeping 😴")
+@discord.app_commands.describe(duration="How many hours do you plan to sleep?")
+async def sleeping(interaction: discord.Interaction, duration: int = 6):
+    result_message = save_sleep(interaction.user.mention, duration)
+    await interaction.response.send_message(result_message, ephemeral=True)
+
+@client.tree.command(name="awake", description="Wake up and stop being listed as sleeping 😎")
+async def awake(interaction: discord.Interaction):
+    user_mention = interaction.user.mention
+    updated_rows = []
+
+    removed = False
+
+    # Load existing data
+    if os.path.isfile("sleep_data.csv"):
+        with open("sleep_data.csv", mode='r', encoding="utf-8") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if not any(row) or row[0] == "usermention":
+                    continue  # Skip blank or header
+                if row[0] != user_mention:
+                    updated_rows.append(row)
+                else:
+                    removed = True  # This user is waking up
+
+    # Save updated rows
+    with open("sleep_data.csv", mode='w', newline='', encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(["usermention", "time_sleep", "time_awake"])  # Keep header
+        writer.writerows(updated_rows)
+
+    # Respond
+    if removed:
+        await interaction.response.send_message("You're awake! ☀️", ephemeral=True)
+    else:
+        await interaction.response.send_message("You're not marked as sleeping 🧐", ephemeral=True)
 
 
 client.run(Token)
