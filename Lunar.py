@@ -171,16 +171,16 @@ async def qr(interaction: discord.Interaction, url: str):
         await interaction.response.send_message("ทำไม่ได้อ่ะค่ะ ขอโทษด้วยนะคะ:sob:", ephemeral=False)
 
 @client.tree.command(name="แปล", description="แก้คำที่ลืมเปลียนภาษาจากข้อความล่าสุด")
-async def แปล(interaction: discord.Interaction):
+async def แปล(interaction: discord.Interaction, sentence: str):
         if interaction.guild and interaction.channel:
             guild_name = interaction.guild.name
             channel_name = interaction.channel.name
-            await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name)), ephemeral=False)
+            await interaction.response.send_message(change_language.language_change(sentence), ephemeral=False)
         else:
             guild_name = 'DM'
             channel_name = 'DM'
             userID = interaction.user.id
-            await interaction.response.send_message(change_language.language_change(find_recent_message.find_recent(server=guild_name, channel=channel_name, userID=userID)), ephemeral=False)
+            await interaction.response.send_message(change_language.language_change(sentence), ephemeral=False)
 
 @client.tree.command(name="id", description="ดู User ID ของตัวเอง")
 async def id(interaction: discord.Interaction):
