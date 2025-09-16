@@ -83,7 +83,10 @@ async def on_message(message):
     # Ignore messages from the bot itself
     if message.author == client.user:
         return
-
+    
+    # Mention respond
+    if client.user in message.mentions:
+        await message.channel.send(random.choice([":heart::sparkles:", ":white_heart::sparkles:", ":white_heart:", ":light_blue_heart:"]))
 
     sleeping_users = []
     updated_rows = []
