@@ -50,6 +50,26 @@ class LinkToBills(discord.ui.View):
         self.add_item(discord.ui.Button(label="Edit Bills", url="https://docs.google.com/spreadsheets/d/1y8rZlKght5j9bNIxx9lbTGQc7CQa_YiUUIHV-CIO2nM/edit?usp=sharing"))
 
 
+import aiohttp
+
+async def llama(prompt: str, model: str = "lunar-3b") -> str:
+    url = "http://127.0.0.1:11434/api/generate"
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.8,
+            "top_p": 0.9,
+            "repeat_penalty": 1.05
+        }
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=payload) as resp:
+            data = await resp.json()
+            return data.get("response", "").strip()
+
+
 @client.event
 async def on_ready():
     print("Lunar is ready")
@@ -86,7 +106,13 @@ async def on_message(message):
     
     # Mention respond
     if client.user in message.mentions:
-        await message.channel.send(random.choice([":heart::sparkles:", ":white_heart::sparkles:", ":white_heart:", ":light_blue_heart:"]))
+        if len(str(message.content)) == len(str(client.user.id)) + 3:
+            await message.channel.send(random.choice([":heart::sparkles:", ":white_heart::sparkles:", ":white_heart:", ":light_blue_heart:"]))
+        else:
+            async with message.channel.typing():
+                reply = await llama(message.content.replace(f"<@{client.user.id}>", "").strip())
+
+            await message.channel.send(reply)
 
     sleeping_users = []
     updated_rows = []
