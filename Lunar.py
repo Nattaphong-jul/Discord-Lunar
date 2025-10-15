@@ -107,7 +107,11 @@ async def on_message(message):
     # Mention respond
     if client.user in message.mentions:
         if len(str(message.content)) == len(str(client.user.id)) + 3:
-            await message.channel.send(random.choice([":heart::sparkles:", ":white_heart::sparkles:", ":white_heart:", ":light_blue_heart:"]))
+            async with message.channel.typing():
+                reply = await llama(message.content.replace(f"<@{client.user.id}>", "Hi Lunar").strip())
+
+            await message.channel.send(reply)
+            # await message.channel.send(random.choice([":heart::sparkles:", ":white_heart::sparkles:", ":white_heart:", ":light_blue_heart:"]))
         else:
             async with message.channel.typing():
                 reply = await llama(message.content.replace(f"<@{client.user.id}>", "").strip())
