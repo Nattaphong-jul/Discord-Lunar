@@ -16,6 +16,7 @@ import random
 import environment_folder
 import calendar_
 import ast
+import ai_channel_manager
 
 environment_folder.ensure_data_directories()
 environment_folder.check_or_create_log()
@@ -118,6 +119,12 @@ async def on_message(message):
 
             await message.channel.send(reply)
 
+    elif ai_channel_manager.is_ai_channel(message.channel.id):
+        async with message.channel.typing():
+            reply = await llama(message.content.replace(f"<@{client.user.id}>", "").strip())
+
+        await message.channel.send(reply)
+
     sleeping_users = []
     updated_rows = []
 
@@ -153,23 +160,6 @@ async def on_message(message):
             await message.channel.send(random.choice(["นอนแล้วค่ะ 😴", "หลับไปแล้วค่ะ 💤"]))
             break
 
-    if message.attachments:
-        # download_dir = fr'{script_dir}/temp/Data/{message.author.id}'
-        download_dir = os.path.join(script_dir, 'temp', 'Data', str(message.author.id))
-        os.makedirs(download_dir, exist_ok=True)
-        for attachment in message.attachments:
-            # file_size = attachment.size / 1024**2
-                # Download each attachment
-            file_path = os.path.join(download_dir, encryption.encrypt(text=attachment.filename, key=str(message.author.id)))
-            print(f"Saved at {file_path}")
-            await attachment.save(file_path)
-    elif str(message.author.id) in os.listdir(os.path.join(script_dir, 'temp', 'Data')):
-        print("deleting")
-        try:
-            shutil.rmtree(os.path.join(script_dir, 'temp', 'Data', str(message.author.id)))
-        except:
-            print(f"Empty Folder: " + os.path.join(script_dir, 'temp', 'Data', str(message.author.id)))
-
     # Language Change function
     if 'แปล' in message.content and message.reference:
         replied_message = await message.channel.fetch_message(message.reference.message_id)
@@ -187,7 +177,7 @@ async def on_message(message):
             await message.channel.send(change_language.language_change(replied_message.content))
         except:
             await message.author.send(change_language.language_change(replied_message.contents))
-            
+
     # Process the command
     await client.process_commands(message)
 
@@ -488,5 +478,21 @@ async def awake(interaction: discord.Interaction):
     else:
         await interaction.response.send_message("หนูยังไม่รู้เลยนะคะว่าพี่นอน 😅", ephemeral=True)
 
+@client.tree.command(name="aimode", description="Switch between AI mode for Lunar in this channel")
+async def aimode(interaction: discord.Interaction):
+    channel = interaction.channel
+    channel_id = str(getattr(channel, "id", None))
+    channel_name = getattr(channel, "name", None) or str(channel)
+
+    if channel_id is None:
+        await interaction.response.send_message("Cannot toggle AI mode in this channel 😵", ephemeral=True)
+        return
+
+    result = ai_channel_manager.toggle_channel(channel_name, channel_id)
+
+    if result == "enabled":
+        await interaction.response.send_message("AI mode enabled ✨", ephemeral=True)
+    else:
+        await interaction.response.send_message("AI mode disabled", ephemeral=True)
 
 client.run(Token)
