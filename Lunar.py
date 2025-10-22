@@ -119,7 +119,7 @@ async def on_message(message):
 
             await message.channel.send(reply)
 
-    elif ai_channel_manager.is_ai_channel(message.channel.id):
+    elif ai_channel_manager.is_ai_channel(message.channel.id) and not message.attachments:
         async with message.channel.typing():
             reply = await llama(message.content.replace(f"<@{client.user.id}>", "").strip())
 
